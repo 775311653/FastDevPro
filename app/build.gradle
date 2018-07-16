@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
+    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.mohe.fastdevpro"
         minSdkVersion 16
@@ -9,13 +10,46 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi'
+        }
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+            jni.srcDirs = []
+        }
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    signingConfigs {
+        debug { //密匙内容，请换成自己的
+//            storeFile file("F:/eclipseDev/EMobile.keystore")
+//            storePassword ""
+//            keyAlias "emobilekey"
+//            keyPassword ""
+        }
+        release {
+
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    google()
 }
 
 dependencies {
