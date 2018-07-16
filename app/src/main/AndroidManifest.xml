@@ -127,7 +127,8 @@
         <!-- </intent-filter> -->
         <!-- </activity> -->
 
-        <activity android:name=".ui.base.BaseActivity"></activity>
+        <activity android:name=".ui.base.BaseActivity" />
+        <activity android:name=".ui.activity.MainActivity"></activity>
     </application>
 
 </manifest>
