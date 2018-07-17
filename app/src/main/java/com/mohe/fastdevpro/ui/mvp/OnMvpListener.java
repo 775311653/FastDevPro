@@ -1,4 +1,4 @@
-package com.mohe.fastdevpro.ui;
+package com.mohe.fastdevpro.ui.mvp;
 
 /**
  * Created by xiePing on 2018/7/16 0016.

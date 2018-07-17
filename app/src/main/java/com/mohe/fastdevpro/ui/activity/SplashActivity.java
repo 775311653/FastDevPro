@@ -5,8 +5,8 @@ import android.widget.TextView;
 
 import com.mohe.fastdevpro.R;
 import com.mohe.fastdevpro.ui.base.BaseActivity;
-import com.mohe.fastdevpro.ui.contract.SplashContract;
-import com.mohe.fastdevpro.ui.presenter.SplashPresenter;
+import com.mohe.fastdevpro.ui.mvp.contract.SplashContract;
+import com.mohe.fastdevpro.ui.mvp.presenter.SplashPresenter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

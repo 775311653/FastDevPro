@@ -1,11 +1,11 @@
-package com.mohe.fastdevpro.ui.model;
+package com.mohe.fastdevpro.ui.mvp.model;
 
 import android.os.CountDownTimer;
 
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
-import com.mohe.fastdevpro.ui.contract.SplashContract;
+import com.mohe.fastdevpro.ui.mvp.contract.SplashContract;
 
 /**
  * Created by xiePing on 2018/7/16 0016.
