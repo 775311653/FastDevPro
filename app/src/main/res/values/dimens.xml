@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="all_left_margin">10dp</dimen>
+    <dimen name="all_right_margin">10dp</dimen>
+    <dimen name="all_padding_left">10dp</dimen>
+    <dimen name="all_padding_left2">5dp</dimen>
+    <dimen name="all_padding_right">10dp</dimen>
+    <dimen name="tab_menu_height">53.5dp</dimen>
+    <dimen name="all_padding_10">10dp</dimen>
+    <dimen name="all_padding_15">15dp</dimen>
+    <dimen name="all_margin_15">15dp</dimen>
+    <dimen name="all_margin_10">10dp</dimen>
+    <dimen name="all_margin_5">5dp</dimen>
+    <dimen name="all_marginTop">8dp</dimen>
+    <dimen name="all_marginTop2">35dp</dimen>
+    <dimen name="all_marginLeft">5dp</dimen>
+    <dimen name="all_marginRight">5dp</dimen>
+    <dimen name="all_marginRight2">22dp</dimen>
+    <dimen name="all_bottom_margin">10dp</dimen>
+    <dimen name="all_textsize">15sp</dimen>
+
+    <dimen name="text_size_l">20sp</dimen>
+    <dimen name="text_size_m">15sp</dimen>
+    <dimen name="text_size_s">12sp</dimen>
+</resources>

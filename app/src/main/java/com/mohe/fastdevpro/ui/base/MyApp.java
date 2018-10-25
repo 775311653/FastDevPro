@@ -2,6 +2,7 @@ package com.mohe.fastdevpro.ui.base;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDex;
 
 import com.blankj.utilcode.util.Utils;
 import com.lzy.okgo.OkGo;
@@ -74,6 +75,7 @@ public class MyApp extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
+        MultiDex.install(this) ;
     }
 
     private class SafeHostnameVerifier implements HostnameVerifier {
