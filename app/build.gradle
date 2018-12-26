@@ -1,7 +1,8 @@
 apply plugin: 'com.android.application'
+//apply plugin: 'fastdex.app'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.mohe.fastdevpro"
@@ -28,7 +29,12 @@ android {
     }
 
     buildTypes {
+        debug{
+            signingConfig signingConfigs.debug
+        }
+
         release {
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -46,20 +52,68 @@ android {
 
         }
     }
+
+    flavorDimensions "default"
+
+    //多渠道打包
+    productFlavors {
+        fast_dev_pro {
+            manifestPlaceholders = [app_name         : "fastDevPro",
+
+            ]
+            dimension "default"
+            applicationId "com.mohe.fastdevpro"
+        }
+
+        demo_pay {
+            manifestPlaceholders = [app_name         : "支付demo",
+
+            ]
+            dimension "default"
+            applicationId "cn.nubia.demo_pay"
+        }
+
+        paycomponent {
+            manifestPlaceholders = [app_name         : "支付组件apk",
+
+            ]
+            dimension "default"
+            applicationId "cn.nubia.paycomponent"
+        }
+
+
+    }
+
 }
 
 repositories {
     mavenCentral()
     google()
+    flatDir{
+        dirs 'libs'
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+//    compile(name: 'demo_pay', ext: 'aar')
+    compile(name: 'payComponent-debug', ext: 'aar'){
+        exclude group: 'com.android.support'
+    }
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation('com.android.support.test.espresso:espresso-contrib:3.0.2') {
+        transitive false
+    }
+    androidTestImplementation 'com.android.support.test.espresso:espresso-web:3.0.2'
+//    androidTestCompile 'com.android.support:support-annotations:' + rootProject.supportLibVersion;
+//    androidTestCompile 'com.android.support:recyclerview-v7:' + rootProject.supportLibVersion;
+
+
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation('com.jakewharton:butterknife:8.8.1') {
         exclude group: 'com.android.support'
@@ -67,15 +121,15 @@ dependencies {
     annotationProcessor('com.jakewharton:butterknife-compiler:8.8.1') {
         exclude group: 'com.android.support'
     }
-    implementation 'com.blankj:utilcode:1.15.0'
+    implementation 'com.blankj:utilcode:1.22.1'
     implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-5'
     implementation 'org.xutils:xutils:3.5.0'
-    implementation('com.github.bumptech.glide:glide:4.7.1') {
-        exclude group: 'com.android.support'
-    }
-    annotationProcessor('com.github.bumptech.glide:compiler:4.7.1') {
-        exclude group: 'com.android.support'
-    }
+//    implementation('com.github.bumptech.glide:glide:4.7.1') {
+//        exclude group: 'com.android.support'
+//    }
+//    annotationProcessor('com.github.bumptech.glide:compiler:4.7.1') {
+//        exclude group: 'com.android.support'
+//    }
     implementation 'com.zhihu.android:matisse:0.5.1'
     implementation 'com.lzy.net:okgo:3.0.4'
     implementation 'com.github.chrisbanes:PhotoView:2.1.4'
