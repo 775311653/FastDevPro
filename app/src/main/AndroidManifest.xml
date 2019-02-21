@@ -113,6 +113,7 @@
             </intent-filter>
         </activity>
 
+
         <!-- <activity -->
         <!-- android:name="com.csii.ui.MainMenuActivity" -->
         <!-- android:configChanges="orientation|keyboardHidden|fontScale" -->
