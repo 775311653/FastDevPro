@@ -82,7 +82,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-
+        <uses-library android:name="android.test.runner" />
         <!-- 适配全面屏，长宽比大的手机 -->
         <meta-data
             android:name="android.max_aspect"
@@ -128,7 +128,8 @@
         <!-- </activity> -->
 
         <activity android:name=".ui.base.BaseActivity" />
-        <activity android:name=".ui.activity.MainActivity"></activity>
+        <activity android:name=".ui.activity.MainActivity" />
+        <activity android:name=".ui.activity.LoginActivity"></activity>
     </application>
 
 </manifest>

@@ -75,6 +75,7 @@ public final class GsonUtils {
      */
     public static <T> T fromJson(final String json, final Class<T> type) {
         return GSON.fromJson(JSONUtil.getJSONObject(json).toString(), type);
+//        return GSON.fromJson(json, type);
     }
 
     /**

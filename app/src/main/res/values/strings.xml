@@ -48,4 +48,13 @@
         This is intended to prevent programs from waiting for the fingerprint sensor indefinitely.
         The timeout is platform and sensor-specific, but is generally about 30 seconds.</string>
     <string name="ErrorUnableToProcess_warning">Error state returned when the sensor was unable to process the current image.</string>
+
+    <string name="login">登录</string>
+    <string name="login_mobile">手机号</string>
+    <string name="login_mobile_hint">请输入您的手机号</string>
+    <string name="login_identify">验证码</string>
+    <string name="login_identify_hint">请输入您的验证码</string>
+    <string name="login_mobile_login">手机登录</string>
+    <string name="login_send_identify">发送验证码</string>
+
 </resources>

@@ -1,41 +1,45 @@
 package com.mohe.fastdevpro.ui.base;
 
-import java.lang.ref.WeakReference;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import kotlin.jvm.internal.Intrinsics;
 
 /**
- * Created by xiePing on 2018/7/16 0016.
+ * Created by xiePing on 2018/10/27 0027.
+ * Description:
  */
-public abstract class BasePresenter<M,V> {
-    public M mModel;
+public class BasePresenter<V extends IView> implements IPresenter<V> {
+    @Nullable
+    private V mRootView;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public WeakReference<V> mView;
-
-
-    public void attachModelView(M pModel, V pView) {
-
-        mView = new WeakReference<V>(pView);
-
-        this.mModel = pModel;
+    @Nullable
+    public final V getMRootView() {
+        return this.mRootView;
     }
 
+    public final void setMRootView(@Nullable V var1) {
+        this.mRootView = var1;
+    }
 
-    public V getView() {
-        if (isAttach()) {
-            return mView.get();
-        } else {
-            return null;
+    public void attachView(@NotNull V mRootView) {
+        Intrinsics.checkParameterIsNotNull(mRootView, "mRootView");
+        this.mRootView = mRootView;
+    }
+
+    public void detachView() {
+        this.mRootView = (V)null;
+        if (!this.compositeDisposable.isDisposed()) {
+            this.compositeDisposable.clear();
         }
+
     }
 
-    public boolean isAttach() {
-        return null != mView && null != mView.get();
-    }
-
-
-    public void onDettach() {
-        if (null != mView) {
-            mView.clear();
-            mView = null;
-        }
+    public final void addSubscription(@NotNull Disposable disposable) {
+        Intrinsics.checkParameterIsNotNull(disposable, "disposable");
+        this.compositeDisposable.add(disposable);
     }
 }

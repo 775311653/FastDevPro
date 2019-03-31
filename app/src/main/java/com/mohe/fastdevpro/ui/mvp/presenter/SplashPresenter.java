@@ -11,12 +11,12 @@ import com.mohe.fastdevpro.ui.mvp.model.SplashModel;
  */
 public class SplashPresenter implements SplashContract.Presenter {
 
-    private SplashActivity mContext;
+    private SplashContract.View iView;
     private SplashModel splashModel;
 
     public SplashPresenter(SplashActivity context) {
-        mContext=context;
         splashModel=new SplashModel();
+        iView=context;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class SplashPresenter implements SplashContract.Presenter {
         splashModel.getTimeCount(new SplashModel.OnCountDownListener() {
             @Override
             public void onTick(long l) {
-                mContext.setTimeCount((int) (l/1000));
+                iView.setTimeCount((int) (l/1000));
             }
 
             @Override

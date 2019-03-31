@@ -3,6 +3,8 @@
  */
 package com.mohe.fastdevpro.utils;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -214,6 +216,7 @@ public class JSONUtil {
 			} catch (JSONException e) {
 			}
 		}
+		Log.e("",value.toString());
 		return value;
 	}
 
