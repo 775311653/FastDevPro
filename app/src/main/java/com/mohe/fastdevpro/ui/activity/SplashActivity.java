@@ -5,6 +5,8 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.mohe.fastdevpro.R;
+import com.mohe.fastdevpro.pattern.builderPattern.BuilderDemoActivity;
+import com.mohe.fastdevpro.pattern.factoryPattern.FactoryPatternActivity;
 import com.mohe.fastdevpro.ui.base.BaseActivity;
 import com.mohe.fastdevpro.ui.mvp.contract.SplashContract;
 import com.mohe.fastdevpro.ui.mvp.presenter.SplashPresenter;
@@ -23,13 +25,14 @@ public class SplashActivity extends BaseActivity implements SplashContract.View 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
-//        initData();
+        initData();
     }
 
     private void initData() {
-        splashPresenter = new SplashPresenter((SplashActivity) mContext);
-        splashPresenter.downCountTime();
-        ActivityUtils.startActivity(LoginActivity.class);
+//        splashPresenter = new SplashPresenter((SplashActivity) mContext);
+//        splashPresenter.downCountTime();
+        ActivityUtils.startActivity(BuilderDemoActivity.class);
+        finish();
     }
 
     @Override

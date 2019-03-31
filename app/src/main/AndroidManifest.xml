@@ -129,7 +129,9 @@
 
         <activity android:name=".ui.base.BaseActivity" />
         <activity android:name=".ui.activity.MainActivity" />
-        <activity android:name=".ui.activity.LoginActivity"></activity>
+        <activity android:name=".ui.activity.LoginActivity" />
+        <activity android:name=".pattern.factoryPattern.FactoryPatternActivity" />
+        <activity android:name=".pattern.builderPattern.BuilderDemoActivity"></activity>
     </application>
 
 </manifest>
