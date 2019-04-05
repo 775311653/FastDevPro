@@ -132,7 +132,9 @@
         <activity android:name=".ui.activity.LoginActivity" />
         <activity android:name=".pattern.factoryPattern.FactoryPatternActivity" />
         <activity android:name=".pattern.builderPattern.BuilderDemoActivity" />
-        <activity android:name=".pattern.filterPattern.FilterDemoActivity"></activity>
+        <activity android:name=".pattern.filterPattern.FilterDemoActivity" />
+        <activity android:name=".pattern.responsibilityChainPattern.ResponsibilityChainDemoActivity" />
+        <activity android:name=".pattern.commandPattern.CommandDemoActivity"></activity>
     </application>
 
 </manifest>

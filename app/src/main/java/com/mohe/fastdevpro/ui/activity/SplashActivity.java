@@ -6,8 +6,10 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.ActivityUtils;
 import com.mohe.fastdevpro.R;
 import com.mohe.fastdevpro.pattern.builderPattern.BuilderDemoActivity;
+import com.mohe.fastdevpro.pattern.commandPattern.CommandDemoActivity;
 import com.mohe.fastdevpro.pattern.factoryPattern.FactoryPatternActivity;
 import com.mohe.fastdevpro.pattern.filterPattern.FilterDemoActivity;
+import com.mohe.fastdevpro.pattern.responsibilityChainPattern.ResponsibilityChainDemoActivity;
 import com.mohe.fastdevpro.ui.base.BaseActivity;
 import com.mohe.fastdevpro.ui.mvp.contract.SplashContract;
 import com.mohe.fastdevpro.ui.mvp.presenter.SplashPresenter;
@@ -32,7 +34,7 @@ public class SplashActivity extends BaseActivity implements SplashContract.View 
     private void initData() {
 //        splashPresenter = new SplashPresenter((SplashActivity) mContext);
 //        splashPresenter.downCountTime();
-        ActivityUtils.startActivity(FilterDemoActivity.class);
+        ActivityUtils.startActivity(CommandDemoActivity.class);
         finish();
     }
 
