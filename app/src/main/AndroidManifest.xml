@@ -134,7 +134,8 @@
         <activity android:name=".pattern.builderPattern.BuilderDemoActivity" />
         <activity android:name=".pattern.filterPattern.FilterDemoActivity" />
         <activity android:name=".pattern.responsibilityChainPattern.ResponsibilityChainDemoActivity" />
-        <activity android:name=".pattern.commandPattern.CommandDemoActivity"></activity>
+        <activity android:name=".pattern.commandPattern.CommandDemoActivity"/>
+        <activity android:name=".pattern.intercepterPattern.IntercepterDemoActivity" />
     </application>
 
 </manifest>

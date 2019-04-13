@@ -9,6 +9,7 @@ import com.mohe.fastdevpro.pattern.builderPattern.BuilderDemoActivity;
 import com.mohe.fastdevpro.pattern.commandPattern.CommandDemoActivity;
 import com.mohe.fastdevpro.pattern.factoryPattern.FactoryPatternActivity;
 import com.mohe.fastdevpro.pattern.filterPattern.FilterDemoActivity;
+import com.mohe.fastdevpro.pattern.intercepterPattern.IntercepterDemoActivity;
 import com.mohe.fastdevpro.pattern.responsibilityChainPattern.ResponsibilityChainDemoActivity;
 import com.mohe.fastdevpro.ui.base.BaseActivity;
 import com.mohe.fastdevpro.ui.mvp.contract.SplashContract;
@@ -34,7 +35,7 @@ public class SplashActivity extends BaseActivity implements SplashContract.View 
     private void initData() {
 //        splashPresenter = new SplashPresenter((SplashActivity) mContext);
 //        splashPresenter.downCountTime();
-        ActivityUtils.startActivity(CommandDemoActivity.class);
+        ActivityUtils.startActivity(IntercepterDemoActivity.class);
         finish();
     }
 
