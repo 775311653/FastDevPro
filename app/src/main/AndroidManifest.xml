@@ -128,7 +128,15 @@
         <!-- </activity> -->
 
         <activity android:name=".ui.base.BaseActivity" />
-        <activity android:name=".ui.activity.MainActivity"></activity>
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:process=":remote"
+            android:exported="true"/>
+
+        <service
+            android:name=".service.StudentUtilsService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

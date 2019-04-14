@@ -12,8 +12,6 @@ import com.lzy.okgo.https.HttpsUtils;
 import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.lzy.okgo.model.HttpParams;
 
-import org.xutils.x;
-
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -31,8 +29,6 @@ public class MyApp extends Application {
         super.onCreate();
         //blankj的三方工具类初始化
         Utils.init(this);
-        //初始化xUtils
-        x.Ext.init(this);
         //初始化OkGo;
         initOkGo();
     }
