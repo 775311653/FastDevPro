@@ -6,6 +6,9 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.mohe.fastdevpro.R;
+import com.mohe.fastdevpro.dymicDemo.RealSubject;
+import com.mohe.fastdevpro.dymicDemo.Subject;
+import com.mohe.fastdevpro.dymicDemo.SubjectUtils;
 import com.mohe.fastdevpro.service.StudentUtilsService;
 import com.mohe.fastdevpro.ui.base.BaseActivity;
 import com.mohe.fastdevpro.ui.mvp.contract.SplashContract;
@@ -26,9 +29,12 @@ public class SplashActivity extends BaseActivity implements SplashContract.View 
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
 //        initData();
-        Intent intent=new Intent(this, StudentUtilsService.class);
-        startService(intent);
-        ActivityUtils.startActivity(MainActivity.class);
+//        Intent intent=new Intent(this, StudentUtilsService.class);
+//        startService(intent);
+//        ActivityUtils.startActivity(MainActivity.class);
+        Subject subject= new RealSubject();
+        Subject subjectDelegate= (Subject) new SubjectUtils().bindSubject(subject);
+        subjectDelegate.request();
     }
 
     private void initData() {
