@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <animator xmlns:android="http://schemas.android.com/apk/res/android"
+        android:valueFrom="300"
+    android:valueTo="800"
+    android:valueType="intType"
+    android:duration="3000"
+    android:startOffset ="1000"
+    android:fillBefore = "true"
+    android:fillAfter = "false"
+    android:fillEnabled= "true"
+    android:repeatMode= "restart"
+    android:repeatCount = "0" />
+
+<!--
+valueFrom valueTo valueType "intType"  duration
+startOffset动画延时开始时间
+fillBefore "true" 动画结束停留在原来位置
+fillAfter "true" 动画结束停留在结束位置，优先于fillBefore
+fillEnable "true" 应用fillBefore的设置，对fillAfter无影响，默认true；
+repeatMode "restart(或者 resverse)"
+repeatCount "0"
+interpolator @[package:]anim/abcInterpolator 自己资源包下的插值器。-->

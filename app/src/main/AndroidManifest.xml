@@ -130,13 +130,15 @@
         <activity android:name=".ui.base.BaseActivity" />
         <activity
             android:name=".ui.activity.MainActivity"
-            android:process=":remote"
-            android:exported="true"/>
+            android:exported="true"
+            android:process=":remote" />
 
         <service
             android:name=".service.StudentUtilsService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".study.animator.AnimatorDemoActivity"></activity>
     </application>
 
 </manifest>

@@ -10,12 +10,14 @@ import com.mohe.fastdevpro.dymicDemo.RealSubject;
 import com.mohe.fastdevpro.dymicDemo.Subject;
 import com.mohe.fastdevpro.dymicDemo.SubjectUtils;
 import com.mohe.fastdevpro.service.StudentUtilsService;
+import com.mohe.fastdevpro.study.animator.AnimatorDemoActivity;
 import com.mohe.fastdevpro.ui.base.BaseActivity;
 import com.mohe.fastdevpro.ui.mvp.contract.SplashContract;
 import com.mohe.fastdevpro.ui.mvp.presenter.SplashPresenter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class SplashActivity extends BaseActivity implements SplashContract.View {
 
@@ -28,22 +30,42 @@ public class SplashActivity extends BaseActivity implements SplashContract.View 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
-//        initData();
-//        Intent intent=new Intent(this, StudentUtilsService.class);
-//        startService(intent);
-//        ActivityUtils.startActivity(MainActivity.class);
-        Subject subject= new RealSubject();
-        Subject subjectDelegate= (Subject) new SubjectUtils().bindSubject(subject);
+        initData();
+
+
+        //aidl跨进程通信的测试
+//        aidlDemo();
+        //动态代理的代码
+//        dymicDelegate();
+    }
+
+    //aidl跨进程通信的测试
+    private void aidlDemo() {
+        Intent intent = new Intent(this, StudentUtilsService.class);
+        startService(intent);
+        ActivityUtils.startActivity(MainActivity.class);
+    }
+
+    //动态代理的代码
+    private void dymicDelegate() {
+        Subject subject = new RealSubject();
+        Subject subjectDelegate = (Subject) new SubjectUtils().bindSubject(subject);
         subjectDelegate.request();
     }
 
     private void initData() {
         splashPresenter = new SplashPresenter((SplashActivity) mContext);
-        splashPresenter.downCountTime();
+//        splashPresenter.downCountTime();
+        ActivityUtils.startActivity(AnimatorDemoActivity.class);
     }
 
     @Override
     public void setTimeCount(int timeCount) {
-        splashTv.setText("还剩下"+timeCount+"秒");
+        splashTv.setText("还剩下" + timeCount + "秒");
+    }
+
+    @OnClick(R.id.splash_tv)
+    public void onViewClicked() {
+        ActivityUtils.startActivity(AnimatorDemoActivity.class);
     }
 }
