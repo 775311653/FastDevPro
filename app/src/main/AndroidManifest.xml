@@ -138,7 +138,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".study.animator.AnimatorDemoActivity"></activity>
+        <activity android:name=".study.animator.AnimatorDemoActivity" />
+        <activity android:name=".study.sqliteDBDemo.SqliteDBDemoActivity"></activity>
     </application>
 
 </manifest>
