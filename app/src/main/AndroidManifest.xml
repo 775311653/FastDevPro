@@ -139,7 +139,9 @@
             android:exported="true" />
 
         <activity android:name=".study.animator.AnimatorDemoActivity" />
-        <activity android:name=".study.sqliteDBDemo.SqliteDBDemoActivity"></activity>
+        <activity android:name=".study.sqliteDBDemo.SqliteDBDemoActivity" />
+        <activity android:name=".study.surfaceDemo.SurfaceDemoActivity"
+            android:theme="@style/SurfaceViewTheme"/>
     </application>
 
 </manifest>

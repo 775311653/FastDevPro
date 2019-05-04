@@ -8,6 +8,10 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="SurfaceViewTheme" parent="AppBaseTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 
     <!-- dialog -->
     <style name="Theme_Dialog" parent="@android:style/Theme.Dialog">
