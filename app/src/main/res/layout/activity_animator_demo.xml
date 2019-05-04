@@ -72,5 +72,62 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="XML属性动画测试"/>
+        <Button
+            android:id="@+id/btn_showInterpolator"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="差值器动画测试"/>
     </LinearLayout>
+    <TextView
+        android:id="@+id/tv_ai"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="accelerate_interpolator"/>
+    <TextView
+        android:id="@+id/tv_oi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="overshoot_interpolator"/>
+    <TextView
+        android:id="@+id/tv_adi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="accelerate_decelerate_interpolator"/>
+    <TextView
+        android:id="@+id/tv_ani"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="anticipate_interpolator"/>
+    <TextView
+        android:id="@+id/tv_anoi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="anticipate_overshoot_interpolator"/>
+    <TextView
+        android:id="@+id/tv_bi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="bounce_interpolator"/>
+    <TextView
+        android:id="@+id/tv_ci"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="cycle_interpolator"/>
+    <TextView
+        android:id="@+id/tv_di"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="decelerate_interpolator"/>
+    <TextView
+        android:id="@+id/tv_li"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="linear_interpolator"/>
+    <TextView
+        android:id="@+id/tv_dai"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="自定义先加速后减速"/>
+
 </LinearLayout>

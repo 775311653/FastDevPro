@@ -68,6 +68,6 @@ public class SplashActivity extends BaseActivity implements SplashContract.View 
 
     @OnClick(R.id.splash_tv)
     public void onViewClicked() {
-        ActivityUtils.startActivity(SurfaceDemoActivity.class);
+        ActivityUtils.startActivity(AnimatorDemoActivity.class);
     }
 }

@@ -145,4 +145,13 @@ public class ObjectAnimatorHelper {
         animatorSet.setTarget(view);
         animatorSet.start();
     }
+
+    /**
+     * 获取位移的ObjectAnimator，给view进行区别设置差值器使用
+     * @return
+     */
+    public static ObjectAnimator getTranslateOA(View view){
+        return ObjectAnimator.ofFloat(view,"translationX",0,600)
+                .setDuration(1500);
+    }
 }
