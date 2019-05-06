@@ -31,7 +31,7 @@ public class CompanyTHelper extends SQLiteOpenHelper {
 
     private static final int VERSION=1;
     public static final String DBNAME="test_db";
-    private final String COMPANY_TABLE_NAME="company";
+    public static final String COMPANY_TABLE_NAME="company";
 
     private String id_key="id";
     private String name_key="name";

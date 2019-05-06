@@ -140,8 +140,18 @@
 
         <activity android:name=".study.animator.AnimatorDemoActivity" />
         <activity android:name=".study.sqliteDBDemo.SqliteDBDemoActivity" />
-        <activity android:name=".study.surfaceDemo.SurfaceDemoActivity"
-            android:theme="@style/SurfaceViewTheme"/>
+        <activity
+            android:name=".study.surfaceDemo.SurfaceDemoActivity"
+            android:theme="@style/SurfaceViewTheme" />
+
+        <provider
+            android:name=".study.sqliteDBDemo.contentProvider.DBContentProvider"
+            android:authorities="com.mohe.fastdevpro.dbContentProvider"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".study.sqliteDBDemo.contentProvider.ContentResolverDemoActivity"
+            android:process=":remote"/>
     </application>
 
 </manifest>
