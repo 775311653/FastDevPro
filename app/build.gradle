@@ -81,4 +81,5 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.1.4'
     implementation 'org.greenrobot:eventbus:3.1.1'
     provided 'de.robv.android.xposed:api:82'
+    provided 'de.robv.android.xposed:api:82:sources'
 }

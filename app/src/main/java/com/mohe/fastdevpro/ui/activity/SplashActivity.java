@@ -17,6 +17,7 @@ import com.mohe.fastdevpro.ui.mvp.presenter.SplashPresenter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.OkHttpClient;
 
 public class SplashActivity extends BaseActivity implements SplashContract.View {
 

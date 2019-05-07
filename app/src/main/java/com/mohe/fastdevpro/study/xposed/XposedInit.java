@@ -1,6 +1,9 @@
 package com.mohe.fastdevpro.study.xposed;
 
+import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -25,8 +28,9 @@ public class XposedInit implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         XposedBridge.log("loadPackage="+lpparam.packageName);
+        MyXposedHelper.initHooking(lpparam);
         //逻辑:在fast1里面写xposed的代码，修改fast2里面的tv的内容，并且在fast1里面获取并打印出来。
-        if (lpparam.packageName.equals(MyXposedHelper.HOOK_PACKAGE_NAME)){
+        if (lpparam.packageName.equals(MyXposedHelper.PACKAGE_NAME_FAST_DEV_PRO)){
             XposedHelpers.findAndHookMethod(MyXposedHelper.SPLASH_ACTIVITY_NAME
                     , lpparam.classLoader, MyXposedHelper.STR_ON_CREATE, Bundle.class, new XC_MethodHook() {
                         @Override
@@ -52,6 +56,72 @@ public class XposedInit implements IXposedHookLoadPackage {
 
                         }
                     });
+        }else if (lpparam.packageName.equals(MyXposedHelper.PACKAGE_NAME_STAR_POS)){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (true){
+                        hookStarPosQueryTrans(lpparam);
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }).start();
+
         }
+    }
+
+    /**
+     * 星管家的查询交易的接口
+     * @param lpparam
+     */
+    private void hookStarPosQueryTrans(final XC_LoadPackage.LoadPackageParam lpparam) {
+        XposedBridge.log("hookStarPosQueryTrans");
+        XposedHelpers.findAndHookMethod(MyXposedHelper.CLS_TRANS_ACTION_QUERY
+                , lpparam.classLoader
+                , MyXposedHelper.METHORD_QUERY_TRANSFER_MONEY
+                , new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        Class c=lpparam.classLoader.loadClass(MyXposedHelper.SPLASH_ACTIVITY_NAME);
+                        XposedBridge.log("调用了星管家的查询交易接口，"+param.toString());
+                    }
+                });
+
+        XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook(){
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                ClassLoader cl = ((Context) param.args[0]).getClassLoader();
+                //cl.loadclass("className")找其他类
+                //Class.forName("className",true,cl)
+                Class<?> hookclass = null;
+                try {
+                    hookclass = cl.loadClass("XXX.XXX.ClassName");
+                } catch (Exception e) {
+                    Log.e("MutiDex", "寻找XXX.XXX.ClassName失败", e);
+                    return;
+                }
+                Log.e("MutiDex", "寻找XXX.XXX.ClassName成功");
+
+                XposedHelpers.findAndHookMethod(
+                        hookclass,
+                        "methodName",//方法名称
+                        args.class,//参数列表
+                        new XC_MethodHook() {
+                            @Override
+                            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                super.beforeHookedMethod(param);
+                            }
+                        });
+            }});
     }
 }
