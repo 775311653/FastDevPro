@@ -87,6 +87,21 @@
         <meta-data
             android:name="android.max_aspect"
             android:value="2.3" />
+
+        <!--xposed的配置 开始-->
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true"/>
+
+        <meta-data
+            android:name="xposeddescription"
+            android:value="hello xposed"/>
+
+        <meta-data
+            android:name="xposedminversion"
+            android:value="82"/>
+        <!--xposed的配置 结束-->
+
         <!-- 安卓7.0问题 -->
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -150,8 +165,9 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".study.sqliteDBDemo.contentProvider.ContentResolverDemoActivity"
-            android:process=":remote"/>
+        <activity
+            android:name=".study.sqliteDBDemo.contentProvider.ContentResolverDemoActivity"
+            android:process=":remote" />
     </application>
 
 </manifest>
