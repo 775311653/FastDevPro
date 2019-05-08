@@ -88,19 +88,18 @@
             android:name="android.max_aspect"
             android:value="2.3" />
 
-        <!--xposed的配置 开始-->
+        <!-- xposed的配置 开始 -->
         <meta-data
             android:name="xposedmodule"
-            android:value="true"/>
-
+            android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="hello xposed"/>
-
+            android:value="hello xposed" />
         <meta-data
             android:name="xposedminversion"
-            android:value="82"/>
-        <!--xposed的配置 结束-->
+            android:value="82" />
+        <!-- xposed的配置 结束 -->
+
 
         <!-- 安卓7.0问题 -->
         <provider
@@ -168,6 +167,11 @@
         <activity
             android:name=".study.sqliteDBDemo.contentProvider.ContentResolverDemoActivity"
             android:process=":remote" />
+
+        <service
+            android:name=".service.XposedQueryTransService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

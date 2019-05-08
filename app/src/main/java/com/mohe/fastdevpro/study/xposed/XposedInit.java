@@ -6,9 +6,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.LogUtils;
+import com.mohe.fastdevpro.bean.TransactionQueryRspBean;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -25,6 +32,10 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
  */
 
 public class XposedInit implements IXposedHookLoadPackage {
+
+    private Object instanceQueryPresenterClass;
+    private Object instanceQueryActivity;
+
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         XposedBridge.log("loadPackage="+lpparam.packageName);
@@ -57,71 +68,113 @@ public class XposedInit implements IXposedHookLoadPackage {
                         }
                     });
         }else if (lpparam.packageName.equals(MyXposedHelper.PACKAGE_NAME_STAR_POS)){
-            new Thread(new Runnable() {
+            XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
                 @Override
-                public void run() {
-                    while (true){
-                        hookStarPosQueryTrans(lpparam);
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                    ClassLoader cl = ((Context)param.args[0]).getClassLoader();
+                    Class<?> hookclass = null;
+                    Class<?> clsHookActivityQuery= null;
+                    try {
+                        hookclass = cl.loadClass(MyXposedHelper.CLS_TRANS_ACTION_QUERY);
+                        clsHookActivityQuery = cl.loadClass(MyXposedHelper.ACTIVITY_TRANS_QUERY);
+                    } catch (Exception e) {
+                        Log.e("jyy", "寻找"+MyXposedHelper.CLS_TRANS_ACTION_QUERY+"报错", e);
+                        return;
                     }
+                    Log.i("jyy", "寻找成功"+MyXposedHelper.CLS_TRANS_ACTION_QUERY);
 
+                    final Class<?> finalHookclass = hookclass;
+                    hookActivityStarPosQueryTrans(lpparam,clsHookActivityQuery);
+                    //获取查询交易类的实例对象，才能使用
+                    instanceQueryPresenterClass =XposedHelpers.newInstance(finalHookclass);
+                    instanceQueryActivity=XposedHelpers.newInstance(clsHookActivityQuery);
+                    //找到类里面的查询交易方法
+                    final Method methodQueryTrans=XposedHelpers.findMethodBestMatch(finalHookclass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
+                    //循环调用查询交易方法
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Timer timer=new Timer();
+                            timer.schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    XposedBridge.log("间隔两秒执行queryTrans的方法");
+                                    XposedBridge.log("hookClass="+finalHookclass.getName());
+                                    try {
+                                        methodQueryTrans.invoke(instanceQueryPresenterClass);
+                                    } catch (Exception e){
+                                        XposedBridge.log(e.getMessage());
+                                    }
+//                                    XposedHelpers.callMethod(finalHookclass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
+                                }
+                            },2000);
+                        }
+                    }).start();
                 }
-            }).start();
+            });
+
 
         }
     }
 
+
+
+
     /**
-     * 星管家的查询交易的接口
-     * @param lpparam
+     * 星管家的查询交易presenter类里面的接口
      */
-    private void hookStarPosQueryTrans(final XC_LoadPackage.LoadPackageParam lpparam) {
+    private void hookStarPosQueryTrans(final XC_LoadPackage.LoadPackageParam lpparam, final Class hookClass) {
         XposedBridge.log("hookStarPosQueryTrans");
-        XposedHelpers.findAndHookMethod(MyXposedHelper.CLS_TRANS_ACTION_QUERY
-                , lpparam.classLoader
-                , MyXposedHelper.METHORD_QUERY_TRANSFER_MONEY
+
+        XposedHelpers.findAndHookMethod(hookClass
+                , MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY
                 , new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         super.beforeHookedMethod(param);
+                        XposedBridge.log("调用了星管家的查询交易接口，beforeHookedMethod,"+param.toString());
+                        Class c= instanceQueryPresenterClass.getClass().getSuperclass();
+                        Field fieldView=c.getDeclaredField("mView");
+                        Field fieldGuid=c.getDeclaredField("mGuid");
+                        fieldView.setAccessible(true);
+                        fieldGuid.setAccessible(true);
+                        Object mView=fieldView.get(instanceQueryPresenterClass);
+                        Object mGuid=fieldGuid.get(instanceQueryPresenterClass);
                     }
 
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        Class c=lpparam.classLoader.loadClass(MyXposedHelper.SPLASH_ACTIVITY_NAME);
-                        XposedBridge.log("调用了星管家的查询交易接口，"+param.toString());
+//                        Class c=hookClass.getClassLoader().loadClass(MyXposedHelper.CLS_TRANS_ACTION_QUERY);
+                        XposedBridge.log("调用了星管家的查询交易接口，afterHookedMethod,"+param.toString());
                     }
                 });
-
-        XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook(){
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                ClassLoader cl = ((Context) param.args[0]).getClassLoader();
-                //cl.loadclass("className")找其他类
-                //Class.forName("className",true,cl)
-                Class<?> hookclass = null;
-                try {
-                    hookclass = cl.loadClass("XXX.XXX.ClassName");
-                } catch (Exception e) {
-                    Log.e("MutiDex", "寻找XXX.XXX.ClassName失败", e);
-                    return;
-                }
-                Log.e("MutiDex", "寻找XXX.XXX.ClassName成功");
-
-                XposedHelpers.findAndHookMethod(
-                        hookclass,
-                        "methodName",//方法名称
-                        args.class,//参数列表
-                        new XC_MethodHook() {
-                            @Override
-                            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                                super.beforeHookedMethod(param);
-                            }
-                        });
-            }});
     }
+
+    /**
+     * hook查询交易记录的页面的查询方法
+     * @param lpparam xposed框架提供的工具参数
+     * @param hookClass transActionQuery的方法
+     */
+    private void hookActivityStarPosQueryTrans(final XC_LoadPackage.LoadPackageParam lpparam, final Class hookClass) {
+        Class<?> clsBeanTrans = XposedHelpers.findClass(MyXposedHelper.BEAN_TRANS_ACTION_QUERY_RSP,lpparam.classLoader);
+        Object beanTrans=XposedHelpers.newInstance(clsBeanTrans);
+        XposedHelpers.findAndHookMethod(hookClass
+                , MyXposedHelper.METHOD_ACTIVITY_QUERY_TRANSFER
+                ,beanTrans.getClass()
+                , new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("hookActivityStarPosQueryTrans,beforeHookedMethod,"+param.toString());
+                        Object data=param.args[0];
+                        String json=GsonUtils.toJson(data);
+                        XposedBridge.log(json);
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("hookActivityStarPosQueryTrans，afterHookedMethod,"+param.toString());
+                    }
+                });
+    }
+
 }

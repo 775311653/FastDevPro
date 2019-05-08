@@ -1,6 +1,9 @@
 package com.mohe.fastdevpro.study.xposed;
 
+import android.app.Application;
+import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -21,6 +24,7 @@ import java.util.regex.Pattern;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
@@ -37,8 +41,14 @@ public class MyXposedHelper {
     public static final String PACKAGE_NAME_STAR_POS="com.newland.satrpos.starposmanager";
     public static final String SPLASH_ACTIVITY_NAME="com.mohe.fastdevpro.ui.activity.SplashActivity";
 
-    public static final String CLS_TRANS_ACTION_QUERY="com.newland.satrpos.starposmanager.module.home.transactionquery";
-    public static final String METHORD_QUERY_TRANSFER_MONEY="queryTransferMoney";
+    public static final String CLS_TRANS_ACTION_QUERY="com.newland.satrpos.starposmanager.module.home.transactionquery.TransactionQueryPresenter";
+    public static final String METHOD_QUERY_TRANSFER_MONEY ="queryTransferMoney";
+
+    public static final String ACTIVITY_TRANS_QUERY="com.newland.satrpos.starposmanager.module.home.transactionquery.TransactionQueryActivity";
+    public static final String METHOD_ACTIVITY_QUERY_TRANSFER="queryTransaction";
+
+    public static final String BEAN_TRANS_ACTION_QUERY_RSP="com.newland.satrpos.starposmanager.model.responsebean.TransactionQueryRspBean";
+
 
     public static final String STR_ON_CREATE="onCreate";
 
@@ -239,6 +249,37 @@ public class MyXposedHelper {
                     }
                 });
 
+    }
+
+
+    public static void initPackageApp(final OnInitAppCallback callback){
+        XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                ClassLoader cl = ((Context)param.args[0]).getClassLoader();
+                Class<?> hookclass = null;
+                try {
+                    hookclass = cl.loadClass("xxx.xxx.xxx");
+                } catch (Exception e) {
+                    Log.e("jyy", "寻找xxx.xxx.xxx报错", e);
+                    return;
+                }
+                Log.i("jyy", "寻找xxx.xxx.xxx成功");
+                callback.onSuccess(hookclass);
+                XposedHelpers.findAndHookMethod(hookclass, "xxx", new XC_MethodHook(){
+                    //进行hook操作
+                });
+            }
+        });
+    }
+
+    public interface OnCallback{
+        void onSuccess(Class cls);
+        void onFail();
+    }
+
+    public interface OnInitAppCallback{
+        void onSuccess(Class hookclass);
     }
 
 }
