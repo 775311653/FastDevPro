@@ -1,9 +1,15 @@
 package com.mohe.fastdevpro.study.xposed;
 
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+
+import com.blankj.utilcode.util.LogUtils;
+import com.mohe.fastdevpro.bean.QueryTransPresenterBean;
+import com.mohe.fastdevpro.service.XposedQueryTransService;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -14,11 +20,14 @@ import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -252,6 +261,7 @@ public class MyXposedHelper {
     }
 
 
+    //初始化的方法应该单独写到helper里面，再给回调方法
     public static void initPackageApp(final OnInitAppCallback callback){
         XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
             @Override
@@ -271,6 +281,57 @@ public class MyXposedHelper {
                 });
             }
         });
+    }
+
+    /**
+     * 循环执行交易查询页面的查询方法
+     * @param instanceQueryPresenterClass 查询页面的presenter类实例对象
+     */
+    public static void scheduleQueryTrans(final Object instanceQueryPresenterClass){
+        Class<?> clzQryTraPresent = null;
+        ClassLoader classLoader=instanceQueryPresenterClass.getClass().getClassLoader();
+        try {
+            clzQryTraPresent = classLoader.loadClass(MyXposedHelper.CLS_TRANS_ACTION_QUERY);
+        } catch (Exception e) {
+            Log.e("jyy", "寻找"+MyXposedHelper.CLS_TRANS_ACTION_QUERY+"报错", e);
+            return;
+        }
+
+        //找到类里面的查询交易方法
+        final Method methodQueryTrans=XposedHelpers.findMethodBestMatch(clzQryTraPresent,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
+        final Class<?> finalClzQryTraPresent = clzQryTraPresent;
+        //循环调用查询交易方法
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Timer timer=new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        XposedBridge.log("间隔两秒执行queryTrans的方法");
+                        XposedBridge.log("hookClass="+ finalClzQryTraPresent.getName());
+                        try {
+                            methodQueryTrans.invoke(instanceQueryPresenterClass);
+                        } catch (Exception e){
+                            XposedBridge.log(e.getMessage());
+                        }
+                    }
+                },2000);
+            }
+        }).start();
+    }
+
+    private static final String TAG = "MyXposedHelper";
+
+    /**
+     * 开启循环执行的服务
+     * @param transQryPresInstance 查询交易的实例对象
+     */
+    public static void startScheduleService(Context context,Object transQryPresInstance){
+        Log.i(TAG,"startScheduleService");
+        Intent intent=new Intent(context,OpenServiceActivity.class);
+        intent.putExtra("instance",new QueryTransPresenterBean(transQryPresInstance));
+        context.startActivity(intent);
     }
 
     public interface OnCallback{
