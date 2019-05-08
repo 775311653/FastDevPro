@@ -88,28 +88,8 @@ public class XposedInit implements IXposedHookLoadPackage {
                     //获取查询交易类的实例对象，才能使用
                     instanceQueryPresenterClass =XposedHelpers.newInstance(finalHookclass);
                     instanceQueryActivity=XposedHelpers.newInstance(clsHookActivityQuery);
-                    //找到类里面的查询交易方法
-                    final Method methodQueryTrans=XposedHelpers.findMethodBestMatch(finalHookclass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
-                    //循环调用查询交易方法
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Timer timer=new Timer();
-                            timer.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    XposedBridge.log("间隔两秒执行queryTrans的方法");
-                                    XposedBridge.log("hookClass="+finalHookclass.getName());
-                                    try {
-                                        methodQueryTrans.invoke(instanceQueryPresenterClass);
-                                    } catch (Exception e){
-                                        XposedBridge.log(e.getMessage());
-                                    }
-//                                    XposedHelpers.callMethod(finalHookclass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
-                                }
-                            },2000);
-                        }
-                    }).start();
+                    //开启循环执行查询交易数据的服务
+                    MyXposedHelper.startScheduleService(((Context)param.args[0]),instanceQueryPresenterClass);
                 }
             });
 

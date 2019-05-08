@@ -171,7 +171,12 @@
         <service
             android:name=".service.XposedQueryTransService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".study.xposed.OpenServiceActivity"
+            android:theme="@style/transparent"
+            android:exported="true"
+            android:enabled="true"/>
     </application>
 
 </manifest>

@@ -1,34 +1,28 @@
 package com.mohe.fastdevpro.service;
 
-import android.app.IntentService;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
+import com.mohe.fastdevpro.bean.QueryTransPresenterBean;
 import com.mohe.fastdevpro.study.xposed.MyXposedHelper;
 
-import java.util.Timer;
-import java.util.TimerTask;
+public class XposedQueryTransService extends Service {
 
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
+    private Object instanceQueryPresent;
 
-public class XposedQueryTransService extends IntentService {
-
-    /**
-     * Creates an IntentService.  Invoked by your subclass's constructor.
-     *
-     * @param name Used to name the worker thread, important only for debugging.
-     */
-    public XposedQueryTransService(String name) {
-        super(name);
+    public XposedQueryTransService() {
     }
 
+    private static final String TAG = "XposedQueryTransService";
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        Log.i(TAG,"XposedQueryTransService onStartCommand");
+        QueryTransPresenterBean bean=intent.getParcelableExtra("instance");
+        instanceQueryPresent=bean.getQueryTransPreInstance();
+        MyXposedHelper.scheduleQueryTrans(instanceQueryPresent);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -39,21 +33,8 @@ public class XposedQueryTransService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
-//        Timer timer=new Timer();
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                XposedBridge.log("间隔两秒执行queryTrans的方法");
-//                XposedBridge.log("hookClass="+finalHookclass.getName());
-//
-//                try {
-//                    XposedHelpers.findMethodBestMatch(finalHookclass, MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY).invoke((Context)param.args[0]);
-//                } catch (Exception e){
-//                    XposedBridge.log(e.getMessage());
-//                }
-////                                    XposedHelpers.callMethod(finalHookclass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
-//            }
-//        },2000);
+    public void onDestroy() {
+        MyXposedHelper.startScheduleService(this,instanceQueryPresent);
+        super.onDestroy();
     }
 }
