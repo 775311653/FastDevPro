@@ -475,7 +475,7 @@ public class MyXposedHelper {
 
             PushStarPosBean starPosBean=new PushStarPosBean();
             starPosBean.setMch_id(queryStoreBean.getMerc_id());
-            starPosBean.setMch_id(queryStoreBean.getStoe_nm());
+            starPosBean.setMch(queryStoreBean.getStoe_nm());
             starPosBean.setBill_no(queryStoreBean.getLog_no());
             starPosBean.setPay_money(queryStoreBean.getTxn_amt());
             starPosBean.setPay_time(queryStoreBean.getTxn_tm());
