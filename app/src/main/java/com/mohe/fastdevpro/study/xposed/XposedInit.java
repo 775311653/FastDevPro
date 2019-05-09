@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.mohe.fastdevpro.bean.TransactionQueryRspBean;
+import com.mohe.fastdevpro.bean.UserBean;
+import com.mohe.fastdevpro.utils.CommonUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -23,6 +26,8 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+
+import static com.mohe.fastdevpro.study.xposed.MyXposedHelper.APP_STOR_POS;
 
 /**
  * Created by xieping on 2019/5/7.
@@ -38,6 +43,8 @@ public class XposedInit implements IXposedHookLoadPackage {
     private Object instanceQueryActivity;
 
     private boolean isScheduling;//是否正在执行循环的逻辑
+
+    private boolean isInitPrepare=false;
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
@@ -92,30 +99,6 @@ public class XposedInit implements IXposedHookLoadPackage {
                     //获取查询交易类的实例对象，才能使用
                     instanceQueryPresenterClass =XposedHelpers.newInstance(finalHookclass);
                     instanceQueryActivity=XposedHelpers.newInstance(clsHookActivityQuery);
-                    //找到类里面的查询交易方法
-                    final Method methodQueryTrans=XposedHelpers.findMethodBestMatch(finalHookclass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
-                    //循环调用查询交易方法
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Timer timer=new Timer();
-                            timer.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    XposedBridge.log("间隔两秒执行queryTrans的方法");
-                                    XposedBridge.log("hookClass="+finalHookclass.getName());
-                                    try {
-//                                        methodQueryTrans.invoke(instanceQueryPresenterClass);
-                                        XposedHelpers.callMethod(instanceQueryActivity,"initViews");
-//                                        XposedHelpers.callMethod(instanceQueryPresenterClass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
-                                    } catch (Exception e){
-                                        XposedBridge.log(e.getMessage());
-                                    }
-//                                    XposedHelpers.callMethod(finalHookclass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
-                                }
-                            },2000);
-                        }
-                    }).start();
                 }
             });
 
@@ -174,30 +157,57 @@ public class XposedInit implements IXposedHookLoadPackage {
                         Object data=param.args[0];
                         String json=GsonUtils.toJson(data);
                         XposedBridge.log(json);
-
                         instanceQueryActivity=param.thisObject;
-                        instanceQueryPresenterClass=XposedHelpers.getObjectField(instanceQueryActivity,"mPresenter");
+                        if (!isInitPrepare){
+                            isInitPrepare=true;
+                            APP_STOR_POS=((Activity) instanceQueryActivity).getApplication();
+                            String strUserBean=GsonUtils.toJson(XposedHelpers.getObjectField(APP_STOR_POS,"a"));
+                            MyXposedHelper.userBean= GsonUtils.fromJson(strUserBean,UserBean.class);
+                            instanceQueryPresenterClass=XposedHelpers.getObjectField(instanceQueryActivity,"mPresenter");
+                        }
+                        MyXposedHelper.getStoeNewTrans(GsonUtils.fromJson(json,TransactionQueryRspBean.class));
+
 //                        if (isScheduling) return;
 //                        isScheduling=true;
-                        //循环调用查询交易方法
-                        Timer timer=new Timer();
-                        timer.schedule(new TimerTask() {
+
+                        Handler handler=new Handler(((Activity)instanceQueryActivity).getMainLooper());
+                        handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                ((Activity)instanceQueryActivity).runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        XposedBridge.log("间隔两秒执行queryTrans的方法");
-                                        try {
-//                                    XposedHelpers.callMethod(instanceQueryActivity,"initViews");
-                                            XposedHelpers.callMethod(instanceQueryPresenterClass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
-                                        } catch (Exception e){
-                                            XposedBridge.log(e.getMessage());
-                                        }
+                                XposedBridge.log("间隔两秒执行queryTrans的方法");
+                                try {
+                                    if (!CommonUtils.isActivityUseable((Activity) instanceQueryActivity)) {
+                                        return;
                                     }
-                                });
+                                    XposedHelpers.callMethod(instanceQueryPresenterClass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
+                                } catch (Exception e){
+                                    XposedBridge.log(e.getMessage());
+                                }
                             }
                         },2000);
+                        //循环调用查询交易方法
+//                        final Timer timer=new Timer();
+//                        timer.schedule(new TimerTask() {
+//                            @Override
+//                            public void run() {
+//                                ((Activity)instanceQueryActivity).runOnUiThread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        XposedBridge.log("间隔两秒执行queryTrans的方法");
+//                                        try {
+////                                    XposedHelpers.callMethod(instanceQueryActivity,"initViews");
+//                                            if (!CommonUtils.isActivityUseable((Activity) instanceQueryActivity)) {
+//                                                timer.cancel();
+//                                                return;
+//                                            }
+//                                            XposedHelpers.callMethod(instanceQueryPresenterClass,MyXposedHelper.METHOD_QUERY_TRANSFER_MONEY);
+//                                        } catch (Exception e){
+//                                            XposedBridge.log(e.getMessage());
+//                                        }
+//                                    }
+//                                });
+//                            }
+//                        },2000);
                     }
 
                     @Override

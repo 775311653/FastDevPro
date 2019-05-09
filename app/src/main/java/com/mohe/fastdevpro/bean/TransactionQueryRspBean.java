@@ -1,7 +1,11 @@
 package com.mohe.fastdevpro.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 所有商铺页面的商铺数据
+ */
 public class TransactionQueryRspBean extends BaseRspBean {
     private List<TransactionQueryBean> qryList;
     private String sn_no;
@@ -69,7 +73,7 @@ public class TransactionQueryRspBean extends BaseRspBean {
     }
 
     public List<TransactionQueryBean> getQryList() {
-        return this.qryList;
+        return this.qryList == null ? new ArrayList<TransactionQueryBean>() :this.qryList;
     }
 
     public void setQryList(List<TransactionQueryBean> list) {
