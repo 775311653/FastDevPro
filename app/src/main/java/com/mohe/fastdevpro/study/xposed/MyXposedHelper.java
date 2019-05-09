@@ -8,7 +8,6 @@ import android.os.Build;
 import android.util.Log;
 
 import com.blankj.utilcode.util.AppUtils;
-import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -17,6 +16,7 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
+import com.mohe.fastdevpro.bean.PushStarPosBean;
 import com.mohe.fastdevpro.bean.QueryTransPresenterBean;
 import com.mohe.fastdevpro.bean.TransactionQueryBean;
 import com.mohe.fastdevpro.bean.TransactionQueryRspBean;
@@ -25,6 +25,7 @@ import com.mohe.fastdevpro.bean.TransactionQueryStoreRspBean;
 import com.mohe.fastdevpro.bean.TrsacnQryStoreQuestBean;
 import com.mohe.fastdevpro.bean.UserBean;
 import com.mohe.fastdevpro.utils.CommonUtils;
+import com.mohe.fastdevpro.utils.GsonUtils;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -41,6 +42,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -81,11 +83,13 @@ public class MyXposedHelper {
 
     public static final String baseUrl="https://gateway.starpos.com.cn";
     public static final String QryTranListUrl=baseUrl+"/estmadp2/qrytran_list.json";
+    public static final String PushStarPosDataUrl="http://43.255.28.117:9090/pay/v1/crawler/hdy.do";
 
     public static final String LastQueryRspBean="lastQueryRspBean";
     public static final String StrLastQueryStoreHashMap="StrLastQueryStoreHashMap";
+    public static List<TransactionQueryStoreBean> newStoreTrans=new ArrayList<>();
 
-    private static int scheduleTaskCnt =0;
+    public static int scheduleTaskCnt =0;
 
     public static Application APP_STOR_POS;
     public static UserBean userBean;
@@ -389,11 +393,12 @@ public class MyXposedHelper {
      记录最新的一个数据到本地保存。即外面的商店列表的接口只是判断是否有变，具体发送什么数据，由获取商店订单的数据进行判断是最新才发送。
      在循环未结束时，停止获取新数据。 对获取到的数据整合发送到服务端。
 
-     * 通过所有商户的数据进行查询新的交易数据.
+     * 通过所有商铺的数据进行查询新的交易数据.
      * @param queryRspBean 商户数据
      */
     public static void getStoeNewTrans(final TransactionQueryRspBean queryRspBean){
         String strLastQueryRspBean= SPUtils.getInstance(userBean.getNumber()).getString(LastQueryRspBean);
+        SPUtils.getInstance(userBean.getNumber()).put(LastQueryRspBean,GsonUtils.toJson(queryRspBean));
         TransactionQueryRspBean lastQuerRspBean= GsonUtils.fromJson(strLastQueryRspBean,TransactionQueryRspBean.class);
         List<TransactionQueryBean> lastQueryBeans=lastQuerRspBean.getQryList();
 
@@ -411,7 +416,7 @@ public class MyXposedHelper {
 
         List<TransactionQueryBean> queryBeans=queryRspBean.getQryList();
         for (int i=0;i<queryBeans.size();i++){
-            TransactionQueryBean queryBean= queryBeans.get(i);
+            final TransactionQueryBean queryBean= queryBeans.get(i);
             TransactionQueryBean lastQryBean=getQueryBeanByMercId(queryBean.getMerc_id(),lastQueryBeans);
 
             String nowCnt=queryBean.getTot_txn_cnt();
@@ -431,11 +436,55 @@ public class MyXposedHelper {
                 getStoeNewTrans(queryBean, diffCnt, new OnCallback<TransactionQueryStoreRspBean>() {
                     @Override
                     public void onSuccess(TransactionQueryStoreRspBean transactionQueryStoreRspBean) {
-                        scheduleTaskCnt--;
+                        //和本地的数据进行比对获取最新的交易记录
+                        List<TransactionQueryStoreBean> queryStoreBeans=getNewQueryStoresCompareLocal(transactionQueryStoreRspBean,queryBean.getMerc_id());
+                        for (int i=0;i<queryStoreBeans.size();i++){
+                            queryStoreBeans.get(i).setMerc_id(queryBean.getMerc_id());
+                        }
+                        pushNewStoreTransToNet(queryStoreBeans);
                     }
                 });
             }
         }
+    }
+
+    /**
+     * 发送数据到服务端
+     * @param queryStoreBeans
+     */
+    private static void pushNewStoreTransToNet(List<TransactionQueryStoreBean> queryStoreBeans) {
+        newStoreTrans.addAll(queryStoreBeans);
+        LogUtils.i("scheduleTaskCnt="+scheduleTaskCnt);
+        if (scheduleTaskCnt!=0) return;
+        List<PushStarPosBean> pushStarPosBeans= convertStarPosBean(newStoreTrans);
+        LogUtils.i(GsonUtils.toJson(pushStarPosBeans));
+        OkGo.<String>post(PushStarPosDataUrl)
+                .upJson(GsonUtils.toJson(pushStarPosBeans))
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        LogUtils.i(response.body());
+                    }
+                });
+    }
+
+    private static List<PushStarPosBean> convertStarPosBean(List<TransactionQueryStoreBean> newStoreTrans) {
+        List<PushStarPosBean> starPosBeans=new ArrayList<>();
+        for (int i=0;i<newStoreTrans.size();i++){
+            TransactionQueryStoreBean queryStoreBean= newStoreTrans.get(i);
+
+            PushStarPosBean starPosBean=new PushStarPosBean();
+            starPosBean.setMch_id(queryStoreBean.getMerc_id());
+            starPosBean.setMch_id(queryStoreBean.getStoe_nm());
+            starPosBean.setBill_no(queryStoreBean.getLog_no());
+            starPosBean.setPay_money(queryStoreBean.getTxn_amt());
+            starPosBean.setPay_time(queryStoreBean.getTxn_tm());
+            starPosBean.setProvider("2");
+
+            starPosBeans.add(starPosBean);
+        }
+
+        return starPosBeans;
     }
 
     /**
@@ -497,7 +546,14 @@ public class MyXposedHelper {
                     public void onSuccess(Response<String> response) {
                         ToastUtils.showLong(response.body());
                         LogUtils.i(response.body());
+                        scheduleTaskCnt--;
                         callback.onSuccess(GsonUtils.fromJson(response.body(),TransactionQueryStoreRspBean.class));
+                    }
+
+                    @Override
+                    public void onError(Response<String> response) {
+                        super.onError(response);
+                        scheduleTaskCnt--;
                     }
                 });
 

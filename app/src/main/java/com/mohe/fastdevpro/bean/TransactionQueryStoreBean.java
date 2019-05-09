@@ -14,7 +14,17 @@ public class TransactionQueryStoreBean {
     private String txn_cd;
     private String txn_fee_amt;
     private String txn_tm;
-    private String txn_typ;
+    private String txn_typ="";
+
+    public String getMerc_id() {
+        return merc_id;
+    }
+
+    public void setMerc_id(String merc_id) {
+        this.merc_id = merc_id;
+    }
+
+    private String merc_id;
 
     public String getPaytype() {
         return this.paytype == null ? "" : this.paytype;

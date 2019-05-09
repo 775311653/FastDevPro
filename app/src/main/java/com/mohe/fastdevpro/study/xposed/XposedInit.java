@@ -45,6 +45,7 @@ public class XposedInit implements IXposedHookLoadPackage {
     private boolean isScheduling;//是否正在执行循环的逻辑
 
     private boolean isInitPrepare=false;
+    private Handler handler;
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
@@ -164,13 +165,20 @@ public class XposedInit implements IXposedHookLoadPackage {
                             String strUserBean=GsonUtils.toJson(XposedHelpers.getObjectField(APP_STOR_POS,"a"));
                             MyXposedHelper.userBean= GsonUtils.fromJson(strUserBean,UserBean.class);
                             instanceQueryPresenterClass=XposedHelpers.getObjectField(instanceQueryActivity,"mPresenter");
+                            handler=new Handler(((Activity)instanceQueryActivity).getMainLooper());
                         }
-                        MyXposedHelper.getStoeNewTrans(GsonUtils.fromJson(json,TransactionQueryRspBean.class));
+
+                        if (MyXposedHelper.scheduleTaskCnt==0){
+                            TransactionQueryRspBean transRspBean= GsonUtils.fromJson(json,TransactionQueryRspBean.class);
+                            if (MyXposedHelper.isTransDataChange(transRspBean)){
+                                MyXposedHelper.getStoeNewTrans(transRspBean);
+                            }
+                        }
 
 //                        if (isScheduling) return;
 //                        isScheduling=true;
 
-                        Handler handler=new Handler(((Activity)instanceQueryActivity).getMainLooper());
+
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
