@@ -459,7 +459,7 @@ public class MyXposedHelper {
         List<PushStarPosBean> pushStarPosBeans= convertStarPosBean(newStoreTrans);
         LogUtils.i(GsonUtils.toJson(pushStarPosBeans));
         OkGo.<String>post(PushStarPosDataUrl)
-                .upJson(GsonUtils.toJson(pushStarPosBeans))
+                .params("bills",GsonUtils.toJson(pushStarPosBeans))
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(Response<String> response) {

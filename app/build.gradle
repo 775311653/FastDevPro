@@ -47,6 +47,57 @@ android {
 
         }
     }
+
+    //多渠道打包
+//    productFlavors {
+//        fastdevpro {
+//            manifestPlaceholders = [app_name         : "com.mohe.fastdevpro",
+//            ]
+//            applicationId "com.mohe.fastdevpro"
+//        }
+//
+//        statPos {
+//            manifestPlaceholders = [app_name         : "星管家助手",
+//            ]
+//            applicationId "com.mohe.fastdevpro"
+//        }
+//
+//
+//    }
+
+    android.applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                output -> outputFileName  = new File(variant.name, "星管家助手" + "_V" + defaultConfig.versionName + "_" + buildType.name + releaseTime() + ".apk")
+            }
+
+    }
+}
+
+static def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
+afterEvaluate {
+    installDebug.doLast {
+        updateVirtualXposedAPP.execute()
+        rebootVirtualXposedAPP.execute()
+        launchVirtualXposedAPP.execute()
+    }
+}
+
+task updateVirtualXposedAPP(type: Exec) {
+    def pkg = android.defaultConfig.applicationId
+    commandLine android.adbExecutable, 'shell', 'am', 'broadcast', '-a', 'io.va.exposed.CMD', '-e', 'cmd', 'update', '-e', 'pkg', pkg
+}
+
+task rebootVirtualXposedAPP(type: Exec) {
+    commandLine android.adbExecutable, 'shell', 'am', 'broadcast', '-a', 'io.va.exposed.CMD', '-e', 'cmd', 'reboot'
+}
+
+task launchVirtualXposedAPP(type: Exec) {
+    def pkg = "com.mohe.fastdevpro" // for example: com.tencent.mm
+    commandLine android.adbExecutable, 'shell', 'am', 'broadcast', '-a', 'io.va.exposed.CMD', '-e', 'cmd', 'launch', '-e', 'pkg', pkg
 }
 
 repositories {
