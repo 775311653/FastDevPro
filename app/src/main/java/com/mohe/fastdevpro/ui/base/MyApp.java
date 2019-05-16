@@ -11,6 +11,7 @@ import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.https.HttpsUtils;
 import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.lzy.okgo.model.HttpParams;
+import com.squareup.leakcanary.LeakCanary;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -31,6 +32,8 @@ public class MyApp extends Application {
         Utils.init(this);
         //初始化OkGo;
         initOkGo();
+        //打开debug下的内存泄漏检查
+        LeakCanary.install(this);
     }
 
     private void initOkGo() {

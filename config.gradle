@@ -50,9 +50,12 @@ ext {
             "espresso-core"     : "com.android.support.test.espresso:espresso-core:${dependVersion.espressoSdkVersion}",
             "espresso-contrib"  : "com.android.support.test.espresso:espresso-contrib:${dependVersion.espressoSdkVersion}",
             "espresso-intents"  : "com.android.support.test.espresso:espresso-intents:${dependVersion.espressoSdkVersion}",
-            "leakcanary-debug"  : 'com.squareup.leakcanary:leakcanary-android:1.5.4',
-            "leakcanary-release": 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4',
             "debug-db"          : 'com.amitshekhar.android:debug-db:1.0.4'
+    ]
+
+    leakDeps = [
+            "leakcanary-debug"  : 'com.squareup.leakcanary:leakcanary-android:1.5.4',
+//            "leakcanary-release": 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4',
     ]
 
     commonDeps = [
@@ -89,6 +92,7 @@ ext {
     networkLibs = retrofit.values()
     rxJavaLibs = rxJava.values()
     commonLibs = commonDeps.values()
+    leakLibs = leakDeps.values()
 
     annotationProcessorLibs = [otherDeps["glideCompiler"]]
 
