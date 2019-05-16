@@ -179,7 +179,8 @@
             android:exported="true"
             android:theme="@style/transparent" />
         <activity android:name=".study.leak.LeakDemoActivity" />
-        <activity android:name=".study.leak.LeakDemo2Activity"></activity>
+        <activity android:name=".study.leak.LeakDemo2Activity" />
+        <activity android:name=".study.layoutOptimize.LayoutOptimizeActivity"></activity>
     </application>
 
 </manifest>
