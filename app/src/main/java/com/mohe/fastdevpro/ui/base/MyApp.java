@@ -11,6 +11,10 @@ import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.https.HttpsUtils;
 import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.lzy.okgo.model.HttpParams;
+import com.mohe.fastdevpro.bean.DaoMaster;
+import com.mohe.fastdevpro.bean.DaoSession;
+
+import org.greenrobot.greendao.database.Database;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -24,6 +28,8 @@ import okhttp3.OkHttpClient;
  * Created by xiePing on 2018/7/14 0014.
  */
 public class MyApp extends Application {
+
+    public static DaoSession daoSession;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -31,6 +37,8 @@ public class MyApp extends Application {
         Utils.init(this);
         //初始化OkGo;
         initOkGo();
+        //初始化greenDao
+        initGreenDao();
     }
 
     private void initOkGo() {
@@ -81,5 +89,13 @@ public class MyApp extends Application {
             //return hostname.equals("server.jeasonlzy.com");
             return true;
         }
+    }
+
+
+    private void initGreenDao() {
+// note: DevOpenHelper is for dev only, use a OpenHelper subclass instead
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "notes-db");
+        Database db = helper.getWritableDb();
+        daoSession = new DaoMaster(db).newSession();
     }
 }
