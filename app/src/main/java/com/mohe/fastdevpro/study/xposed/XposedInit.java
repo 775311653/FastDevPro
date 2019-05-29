@@ -120,6 +120,7 @@ public class XposedInit implements IXposedHookLoadPackage {
                     Log.i("jyy", "寻找成功"+UnionPayXpHelper.CLS_CP_TRANSFER_RESP_PARAM);
 
                     UnionPayXpHelper.hookCPGetOrders(lpparam,hookclass);
+                    UnionPayXpHelper.hookUPActivityMainOnCreate();
                 }
             });
 

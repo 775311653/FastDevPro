@@ -6,7 +6,9 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -153,7 +155,30 @@ public class UnionPayXpHelper {
 
     }
 
-    private class MyBroadcastReceiver extends BroadcastReceiver {
+    public static void hookUPActivityMainOnCreate(){
+        XposedHelpers.findAndHookMethod(Activity.class, "onCreate", Bundle.class, new XC_MethodHook() {
+            /* Access modifiers changed, original: protected */
+            public void afterHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                if (methodHookParam.thisObject.getClass().toString().contains("com.unionpay.activity.UPActivityMain") && !UNIONPAY_HOOK) {
+                    UNIONPAY_HOOK = true;
+                    activity = (Activity) methodHookParam.thisObject;
+                    app = activity.getApplication();
+                    IntentFilter intentFilter = new IntentFilter();
+                    intentFilter.addAction(ACTION_CONNECT);
+                    intentFilter.addAction(checkOrder);
+                    activity.registerReceiver(new MyBroadcastReceiver(), intentFilter);
+                    handler = new MyHandler(activity.getMainLooper());
+                    newhandler = new MyNweHandler(activity.getMainLooper());
+                    Message message = new Message();
+                    message.what = 1;
+                    message.obj = "unioPay广播注册完成";
+                    handler.sendMessage(message);
+                }
+            }
+        });
+    }
+
+    private static class MyBroadcastReceiver extends BroadcastReceiver {
         private MyBroadcastReceiver() {
         }
 
@@ -645,7 +670,6 @@ public class UnionPayXpHelper {
                     stringBuilder.append("二维码地址:");
                     stringBuilder.append(obj);
                     message.obj = stringBuilder.toString();
-                    FileUtils fileUtils = new FileUtils();
                     File file=FileUtils.getFileByPath("/sdcard/code/code.txt");
                     String read = IOUtils.toString(new FileInputStream(file));
                     mlog(read);
