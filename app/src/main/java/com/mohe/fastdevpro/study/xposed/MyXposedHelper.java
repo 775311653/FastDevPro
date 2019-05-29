@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.LogUtils;
@@ -292,6 +294,25 @@ public class MyXposedHelper {
 
     }
 
+    /**
+     * hook控件被点击的操作
+     */
+    public static void hookViewClick(){
+        findAndHookMethod(View.class ,"setOnClickListener", View.OnClickListener.class, new XC_MethodHook() {
+
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                View view = (View)param.thisObject;
+                //ImageView
+                String Str = null;
+                if (view instanceof TextView){//也有可能是ImageView，所以得判断一下
+                    Str = ((TextView)view).getText().toString();
+                }
+                int btnId = view.getId();
+                Log.i("ButtonInfo", Str + " " + btnId);
+            }
+        });
+    }
 
     //初始化的方法应该单独写到helper里面，再给回调方法
     public static void initPackageApp(final OnInitAppCallback callback){

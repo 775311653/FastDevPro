@@ -51,6 +51,7 @@ public class XposedInit implements IXposedHookLoadPackage {
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         XposedBridge.log("loadPackage="+lpparam.packageName);
         MyXposedHelper.initHooking(lpparam);
+        MyXposedHelper.hookViewClick();
         //逻辑:在fast1里面写xposed的代码，修改fast2里面的tv的内容，并且在fast1里面获取并打印出来。
         if (lpparam.packageName.equals(MyXposedHelper.PACKAGE_NAME_FAST_DEV_PRO)){
             XposedHelpers.findAndHookMethod(MyXposedHelper.SPLASH_ACTIVITY_NAME
@@ -100,6 +101,25 @@ public class XposedInit implements IXposedHookLoadPackage {
                     //获取查询交易类的实例对象，才能使用
                     instanceQueryPresenterClass =XposedHelpers.newInstance(finalHookclass);
                     instanceQueryActivity=XposedHelpers.newInstance(clsHookActivityQuery);
+                }
+            });
+
+
+        }else if (lpparam.packageName.equals(UnionPayXpHelper.PACKAGE_NAME_CLOUD_PAY)){
+            XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                    ClassLoader cl = ((Context)param.args[0]).getClassLoader();
+                    Class<?> hookclass = null;
+                    try {
+                        hookclass = cl.loadClass(UnionPayXpHelper.CLS_CP_TRANSFER_RESP_PARAM);
+                    } catch (Exception e) {
+                        Log.e("jyy", "寻找"+UnionPayXpHelper.CLS_CP_TRANSFER_RESP_PARAM+"报错", e);
+                        return;
+                    }
+                    Log.i("jyy", "寻找成功"+UnionPayXpHelper.CLS_CP_TRANSFER_RESP_PARAM);
+
+                    UnionPayXpHelper.hookCPGetOrders(lpparam,hookclass);
                 }
             });
 
