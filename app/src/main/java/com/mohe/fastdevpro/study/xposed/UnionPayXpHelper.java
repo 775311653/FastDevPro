@@ -108,9 +108,9 @@ public class UnionPayXpHelper {
         });
     }
 
-    public static void hookCPGetOrders(){
+    public static void hookCPGetOrders(Class UPPushService){
         try {
-            XposedHelpers.findAndHookMethod(mClassLoader.loadClass(CLS_CP_UPPushService)
+            XposedHelpers.findAndHookMethod(UPPushService
                     , "c"
                     ,String.class
                     , new XC_MethodHook() {
@@ -219,15 +219,16 @@ public class UnionPayXpHelper {
                 XposedBridge.log(stringBuilder.toString());
                 final String finalStringExtra = stringExtra;
                 final String finalStringExtra1 = stringExtra2;
-                getVirtualCardNum(new GetCardNumListener() {
-                    public void error(String str) {
-                    }
-
-                    public void success(String str) {
-                        time = Long.valueOf(System.currentTimeMillis());
-                        GenQrCode(finalStringExtra, finalStringExtra1);
-                    }
-                });
+                GenQrCode(finalStringExtra, finalStringExtra1);
+//                getVirtualCardNum(new GetCardNumListener() {
+//                    public void error(String str) {
+//                    }
+//
+//                    public void success(String str) {
+//                        time = Long.valueOf(System.currentTimeMillis());
+//                        GenQrCode(finalStringExtra, finalStringExtra1);
+//                    }
+//                });
             } else if (intent.getAction().equals(checkOrder)) {
                 XposedBridge.log("收到");
                 stringExtra = intent.getStringExtra("name");
@@ -366,7 +367,7 @@ public class UnionPayXpHelper {
     public static void getVirtualCardNum(final GetCardNumListener getCardNumListener) {
         new Thread(new Runnable() {
             public void run() {
-                GetCardNumListener getCardNumListener = null;
+//                GetCardNumListener getCardNumListener = null;
                 StringBuilder stringBuilder;
                 try {
                     mlog("GetVirtualCardNum");
@@ -378,6 +379,7 @@ public class UnionPayXpHelper {
                     StringBuilder stringBuilder4 = new StringBuilder();
                     stringBuilder4.append("0;");
                     stringBuilder4.append(System.currentTimeMillis());
+//                    String string="";
                     String string = okHttpClient.newCall(new Request.Builder().url(stringBuilder3)
                             .header("X-Tingyun-Id", getXTid())
                             .header("X-Tingyun-Lib-Type-N-ST", stringBuilder4.toString())
@@ -390,6 +392,31 @@ public class UnionPayXpHelper {
                             .header("gray", getgray()).header("key_session_id", "")
                             .header(HTTP.TARGET_HOST, "pay.95516.com")
                             .build()).execute().body().string();
+//                    OkGo.<String>post(stringBuilder3)
+//                            .headers("X-Tingyun-Id", getXTid())
+//                            .headers("X-Tingyun-Lib-Type-N-ST", stringBuilder4.toString())
+//                            .headers("sid", getSid())
+//                            .headers("urid", geturid())
+//                            .headers("cityCd", getcityCd())
+//                            .headers("locale", "zh-CN")
+//                            .headers(HTTP.USER_AGENT, "Android CHSP")
+//                            .headers("dfpSessionId", getDfpSessionId())
+//                            .headers("gray", getgray())
+//                            .headers("key_session_id", "")
+//                            .headers(HTTP.TARGET_HOST, "pay.95516.com")
+//                            .execute(new StringCallback() {
+//                                @Override
+//                                public void onSuccess(Response<String> response) {
+//                                    mlog("二维码预请求" +response.body());
+//                                }
+//
+//                                @Override
+//                                public void onError(Response<String> response) {
+//                                    super.onError(response);
+//                                    mlog("二维码预请求错误" +response.body());
+//                                }
+//                            });
+                    mlog(string);
                     stringBuilder = new StringBuilder();
                     stringBuilder.append("GetVirtualCardNum str2=>");
                     stringBuilder.append(stringBuilder3);
@@ -414,7 +441,7 @@ public class UnionPayXpHelper {
                 } catch (Throwable th) {
                     mlog(th);
                     if (getCardNumListener != null) {
-                        getCardNumListener = getCardNumListener;
+//                        getCardNumListener = getCardNumListener;
                         stringBuilder = new StringBuilder();
                         stringBuilder.append(th.getMessage());
                         stringBuilder.append(th.getCause());
@@ -461,7 +488,7 @@ public class UnionPayXpHelper {
             return obj;
         } catch (Throwable th) {
             mlog(th);
-            return null;
+            return "";
         }
     }
 
@@ -623,7 +650,7 @@ public class UnionPayXpHelper {
                 });
     }
 
-    public static void GenQrCode(final String str, final String str2) {
+    public static void GenQrCode(final String money, final String mark) {
         new Thread(new Runnable() {
             public void run() {
                 try {
@@ -631,13 +658,12 @@ public class UnionPayXpHelper {
                     message.what = 2;
                     message.obj = "开始生成二维码";
                     newhandler.sendMessage(message);
-                    String str = str2;
-                    String replace = new BigDecimal(str).setScale(2, RoundingMode.HALF_UP).toPlainString().replace(".", "");
+                    String replace = new BigDecimal(money).setScale(2, RoundingMode.HALF_UP).toPlainString().replace(".", "");
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.append("FORRECODE GenQrCode:0 money:");
                     stringBuilder.append(replace);
                     stringBuilder.append(" mark:");
-                    stringBuilder.append(str);
+                    stringBuilder.append(mark);
                     mlog(stringBuilder.toString());
                     stringBuilder = new StringBuilder();
                     stringBuilder.append("https://pay.95516.com/pay-web/restlet/qr/p2pPay/applyQrCode?txnAmt=");
@@ -645,15 +671,15 @@ public class UnionPayXpHelper {
                     stringBuilder.append("&cityCode=");
                     stringBuilder.append(Enc(getcityCd()));
                     stringBuilder.append("&comments=");
-                    stringBuilder.append(Enc(str));
+                    stringBuilder.append(Enc(mark));
                     stringBuilder.append("&virtualCardNo=");
                     stringBuilder.append(encvirtualCardNo);
-                    str = stringBuilder.toString();
+                    String url = stringBuilder.toString();
                     OkHttpClient okHttpClient = new OkHttpClient();
                     StringBuilder stringBuilder2 = new StringBuilder();
                     stringBuilder2.append("0;");
                     stringBuilder2.append(System.currentTimeMillis());
-                    replace = okHttpClient.newCall(new Request.Builder().url(str)
+                    String resultQrCode = okHttpClient.newCall(new Request.Builder().url(url)
                             .header("X-Tingyun-Id", getXTid())
                             .header("X-Tingyun-Lib-Type-N-ST", stringBuilder2.toString())
                             .header("sid", getSid())
@@ -668,16 +694,12 @@ public class UnionPayXpHelper {
                             .build()).execute().body().string();
                     stringBuilder = new StringBuilder();
                     stringBuilder.append("GenQrCode str2=>");
-                    stringBuilder.append(str);
+                    stringBuilder.append(resultQrCode);
                     stringBuilder.append(" RSP=>");
                     stringBuilder.append(replace);
                     mlog(stringBuilder.toString());
-                    str = Dec(replace);
-                    StringBuilder stringBuilder3 = new StringBuilder();
-                    stringBuilder3.append(" RSP=>");
-                    stringBuilder3.append(str);
-                    mlog(stringBuilder3.toString());
-                    JSONObject jSONObject = new JSONObject(str).getJSONObject("params");
+//                    str = Dec(replace);
+                    JSONObject jSONObject = new JSONObject(resultQrCode).getJSONObject("params");
                     Object obj = "";
                     if (jSONObject.has("certificate")) {
                         obj = jSONObject.get("certificate").toString();
@@ -687,28 +709,28 @@ public class UnionPayXpHelper {
                     stringBuilder = new StringBuilder();
                     stringBuilder.append("二维码地址:");
                     stringBuilder.append(obj);
-                    message.obj = stringBuilder.toString();
-                    File file=FileUtils.getFileByPath("/sdcard/code/code.txt");
-                    String read = IOUtils.toString(new FileInputStream(file));
-                    mlog(read);
-                    JSONArray jSONArray = new JSONArray();
-                    if (!(read == null || read == "")) {
-                        jSONArray = new JSONArray(read);
-                        for (int i=0;i<jSONArray.length();i++){
-                            JSONObject js=jSONArray.getJSONObject(i);
-                            if (str.equals(js.getString("money"))) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                    jSONArray.remove(i);
-                                }
-                            }
-                        }
-                    }
-                    JSONObject jSONObject2 = new JSONObject();
-                    jSONObject2.put("money", str);
-                    jSONObject2.put("mark", str2);
-                    jSONObject2.put("payurl", obj);
-                    jSONArray.put(jSONObject2);
-                    com.mohe.fastdevpro.study.xposed.util.FileUtils.writeTxtToFile(jSONArray.toString(), "/sdcard/code/", "code.txt");
+//                    message.obj = stringBuilder.toString();
+//                    File file=FileUtils.getFileByPath("/sdcard/code/code.txt");
+//                    String read = IOUtils.toString(new FileInputStream(file));
+//                    mlog(read);
+//                    JSONArray jSONArray = new JSONArray();
+//                    if (!(read == null || read == "")) {
+//                        jSONArray = new JSONArray(read);
+//                        for (int i=0;i<jSONArray.length();i++){
+//                            JSONObject js=jSONArray.getJSONObject(i);
+//                            if (str.equals(js.getString("money"))) {
+//                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                                    jSONArray.remove(i);
+//                                }
+//                            }
+//                        }
+//                    }
+//                    JSONObject jSONObject2 = new JSONObject();
+//                    jSONObject2.put("money", str);
+//                    jSONObject2.put("mark", str2);
+//                    jSONObject2.put("payurl", obj);
+//                    jSONArray.put(jSONObject2);
+//                    com.mohe.fastdevpro.study.xposed.util.FileUtils.writeTxtToFile(jSONArray.toString(), "/sdcard/code/", "code.txt");
 //                    CommonData.setPayUrl(obj);
                     handler.sendMessage(message);
                 } catch (Throwable th) {

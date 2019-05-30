@@ -107,6 +107,7 @@ public class XposedInit implements IXposedHookLoadPackage {
 
         }else if (lpparam.packageName.equals(UnionPayXpHelper.PACKAGE_NAME_CLOUD_PAY)){
             UnionPayXpHelper.hookLoadClass();
+            UnionPayXpHelper.hookUPActivityMainOnCreate();
         }
     }
 

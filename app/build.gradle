@@ -69,7 +69,7 @@ android {
     android.applicationVariants.all {
         variant ->
             variant.outputs.all {
-                output -> outputFileName  = new File(variant.name, "StarPos" + "_V" + defaultConfig.versionName + "_" + buildType.name + releaseTime() + ".apk")
+                output -> outputFileName = new File(variant.name, "StarPos" + "_V" + defaultConfig.versionName + "_" + buildType.name + releaseTime() + ".apk")
             }
 
     }
