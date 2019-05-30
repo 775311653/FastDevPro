@@ -15,7 +15,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.LogUtils;
@@ -40,14 +39,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -67,16 +64,14 @@ public class UnionPayXpHelper {
     public static String encvirtualCardNo = null;
     public static MyHandler handler = null;
     public static ClassLoader mClassLoader = null;
-    public static String mNotifyurl = "http://103.249.104.14/commonApi/callback";
+//    public static String mNotifyurl = "http://103.249.104.14/commonApi/callback";
+    public static String mNotifyurl = "http://www.baidu.com";
     public static MyNweHandler newhandler;
     public static Service pushService;
     public static Long time;
 
     public static final String PACKAGE_NAME_CLOUD_PAY="com.unionpay";
-    //    public static final String CLS_CP_TRANSFER_RESP_PARAM="com.unionpay.network.model.resp.UPQrp2ptransferRecordRespParam";
-//    public static final String CLS_CP_TRANSFER_RESP_PARAM="com.unionpay.network.model.UPID";
-    public static final String CLS_CP_TRANSFER_RESP_PARAM="com.unionpay.push.UPPushService";
-    //    public static final String METHOD_GET_ORDERS="getOrders";
+    public static final String CLS_CP_UPPushService ="com.unionpay.push.UPPushService";
     public static final String METHOD_GET_ORDERS="onCreateView";
 
     public static final String ACTION_CONNECT = "com.chuxin.socket.ACTION_CONNECT";
@@ -89,13 +84,35 @@ public class UnionPayXpHelper {
     public static CPOrderBeanDao orderBeanDao;
     private static final String TAG = "UnionPayXpHelper";
 
-    public static void hookCPGetOrders(final XC_LoadPackage.LoadPackageParam lpparam, final Class hookClass){
+    public static void hookLoadClass() {
+        //使用loadClass来代替attach可以保证不会出现类不存在的问题
+        XposedHelpers.findAndHookMethod(ClassLoader.class, "loadClass", String.class, new XC_MethodHook() {
+            /* Access modifiers changed, original: protected */
+            public void afterHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                super.afterHookedMethod(methodHookParam);
+                //进入到云闪付的界面时初始化一些数据,防止重复调用增加内存
+                if (isCPOrderInited=false){
+                    isCPOrderInited=true;
+                    mClassLoader= ((Context)methodHookParam.args[0]).getClassLoader();
+                }
+
+                if (((String) methodHookParam.args[0]).equals("com.unionpay.push.UPPushService")) {
+                    XposedBridge.log("===>push hook=");
+                    if (UPPushService == null) {
+                        UPPushService = (Class) methodHookParam.getResult();
+                        hookCPGetOrders();
+                        UnionPayXpHelper.hookUPActivityMainOnCreate();
+                    }
+                }
+            }
+        });
+    }
+
+    public static void hookCPGetOrders(){
         try {
-            XposedHelpers.findAndHookMethod(hookClass
+            XposedHelpers.findAndHookMethod(mClassLoader.loadClass(CLS_CP_UPPushService)
                     , "c"
-//                    ,XposedHelpers.newInstance(lpparam.classLoader.loadClass("com.unionpay.network.model.UPID"),1).getClass()
                     ,String.class
-//                    ,Class.class
                     , new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -212,6 +229,7 @@ public class UnionPayXpHelper {
                     }
                 });
             } else if (intent.getAction().equals(checkOrder)) {
+                XposedBridge.log("收到");
                 stringExtra = intent.getStringExtra("name");
                 stringExtra2 = intent.getStringExtra("title");
                 final String finalStringExtra2 = stringExtra;

@@ -106,25 +106,7 @@ public class XposedInit implements IXposedHookLoadPackage {
 
 
         }else if (lpparam.packageName.equals(UnionPayXpHelper.PACKAGE_NAME_CLOUD_PAY)){
-            XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                    ClassLoader cl = ((Context)param.args[0]).getClassLoader();
-                    Class<?> hookclass = null;
-                    try {
-                        hookclass = cl.loadClass(UnionPayXpHelper.CLS_CP_TRANSFER_RESP_PARAM);
-                    } catch (Exception e) {
-                        Log.e("jyy", "寻找"+UnionPayXpHelper.CLS_CP_TRANSFER_RESP_PARAM+"报错", e);
-                        return;
-                    }
-                    Log.i("jyy", "寻找成功"+UnionPayXpHelper.CLS_CP_TRANSFER_RESP_PARAM);
-
-                    UnionPayXpHelper.hookCPGetOrders(lpparam,hookclass);
-                    UnionPayXpHelper.hookUPActivityMainOnCreate();
-                }
-            });
-
-
+            UnionPayXpHelper.hookLoadClass();
         }
     }
 
