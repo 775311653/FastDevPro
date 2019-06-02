@@ -163,6 +163,10 @@
             android:authorities="com.mohe.fastdevpro.dbContentProvider"
             android:enabled="true"
             android:exported="true" />
+        <service
+            android:name=".study.websocket.SocketService"
+            android:enabled="true"
+            android:exported="true" />
 
         <activity
             android:name=".study.sqliteDBDemo.contentProvider.ContentResolverDemoActivity"
