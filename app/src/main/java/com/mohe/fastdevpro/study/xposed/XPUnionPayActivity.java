@@ -47,6 +47,12 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import okio.ByteString;
 
 import static com.mohe.fastdevpro.study.xposed.UnionPayXpHelper.ACTION_CONNECT;
 
@@ -85,14 +91,27 @@ public class XPUnionPayActivity extends BaseActivity implements AddReqPayQrCodeI
 
         //绑定socketService
 //        bindSocketService();
-        try {
-            startWebSocket();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            startWebSocket();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        connect();
 
     }
 
+    private void connect() {
+
+        EchoWebSocketListener listener = new EchoWebSocketListener();
+        Request request = new Request.Builder()
+                .url("ws://" +"47.244.149.48:84/ws.ashx"+"?user=C1")
+                .build();
+        OkHttpClient client = new OkHttpClient();
+        client.newWebSocket(request, listener);
+
+        client.dispatcher().executorService().shutdown();
+    }
     private void startWebSocket() throws Exception {
         HashMap<String,String> map=new HashMap<>();
         map.put("origin",  "");
@@ -100,6 +119,7 @@ public class XPUnionPayActivity extends BaseActivity implements AddReqPayQrCodeI
         List<IProtocol> list = new ArrayList<>();
         list.add(new Protocol("echo-protocol"));
         Draft_6455 draft = new Draft_6455(Collections.<IExtension>emptyList(), list);
+
         socketClient=new WebSocketClient(new URI("ws://" +"47.244.149.48:84/ws.ashx"+"?user=C1")) {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
@@ -233,11 +253,12 @@ public class XPUnionPayActivity extends BaseActivity implements AddReqPayQrCodeI
         });
     }
 
-
+private WebSocket mWebSocket;
     @OnClick(R.id.btn_qr_code)
     public void onViewClicked() {
 //        getQrCode();
-        socketClient.send("{money: \"100\", uid: \"c123\", descUser: \"001\"}");
+//        socketClient.send("{money: \"100\", uid: \"c123\", descUser: \"001\"}");
+        mWebSocket.send("hello world");
     }
 
     public void getQrCode() {
@@ -258,4 +279,43 @@ public class XPUnionPayActivity extends BaseActivity implements AddReqPayQrCodeI
         super.onDestroy();
         unregisterReceiver(mReceiver);
     }
+
+    private final class EchoWebSocketListener extends WebSocketListener {
+
+        @Override
+        public void onOpen(WebSocket webSocket, Response response) {
+            mWebSocket=webSocket;
+            webSocket.send("hello world");
+            webSocket.send("welcome");
+            webSocket.send(ByteString.decodeHex("adef"));
+            webSocket.close(1000, "再见");
+        }
+
+        @Override
+        public void onMessage(WebSocket webSocket, String text) {
+            LogUtils.i("onMessage: " + text);
+        }
+
+        @Override
+        public void onMessage(WebSocket webSocket, ByteString bytes) {
+            LogUtils.i("onMessage byteString: " + bytes);
+        }
+
+        @Override
+        public void onClosing(WebSocket webSocket, int code, String reason) {
+            webSocket.close(1000, null);
+            LogUtils.i("onClosing: " + code + "/" + reason);
+        }
+
+        @Override
+        public void onClosed(WebSocket webSocket, int code, String reason) {
+            LogUtils.i("onClosed: " + code + "/" + reason);
+        }
+
+        @Override
+        public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+            LogUtils.i("onFailure: " + t.getMessage());
+        }
+    }
+
 }
