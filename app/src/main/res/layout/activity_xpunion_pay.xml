@@ -29,4 +29,9 @@
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_launcher"
         android:scaleType="fitCenter"/>
+    <TextView
+        android:id="@+id/tv_qr_url"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="二维码地址"/>
 </LinearLayout>

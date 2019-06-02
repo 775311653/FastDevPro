@@ -100,7 +100,7 @@ public class UnionPayXpHelper {
                     XposedBridge.log("===>push hook=");
                     if (UPPushService == null) {
                         UPPushService = (Class) methodHookParam.getResult();
-                        hookCPGetOrders();
+                        hookCPGetOrders(UPPushService);
                         UnionPayXpHelper.hookUPActivityMainOnCreate();
                     }
                 }
@@ -219,16 +219,16 @@ public class UnionPayXpHelper {
                 XposedBridge.log(stringBuilder.toString());
                 final String finalStringExtra = stringExtra;
                 final String finalStringExtra1 = stringExtra2;
-                GenQrCode(finalStringExtra, finalStringExtra1);
-//                getVirtualCardNum(new GetCardNumListener() {
-//                    public void error(String str) {
-//                    }
-//
-//                    public void success(String str) {
-//                        time = Long.valueOf(System.currentTimeMillis());
-//                        GenQrCode(finalStringExtra, finalStringExtra1);
-//                    }
-//                });
+//                GenQrCode(finalStringExtra, finalStringExtra1);
+                getVirtualCardNum(new GetCardNumListener() {
+                    public void error(String str) {
+                    }
+
+                    public void success(String str) {
+                        time = Long.valueOf(System.currentTimeMillis());
+                        GenQrCode(finalStringExtra, finalStringExtra1);
+                    }
+                });
             } else if (intent.getAction().equals(checkOrder)) {
                 XposedBridge.log("收到");
                 stringExtra = intent.getStringExtra("name");
@@ -709,7 +709,7 @@ public class UnionPayXpHelper {
                     stringBuilder = new StringBuilder();
                     stringBuilder.append("二维码地址:");
                     stringBuilder.append(obj);
-//                    message.obj = stringBuilder.toString();
+                    message.obj = stringBuilder.toString();
 //                    File file=FileUtils.getFileByPath("/sdcard/code/code.txt");
 //                    String read = IOUtils.toString(new FileInputStream(file));
 //                    mlog(read);
