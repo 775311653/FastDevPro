@@ -9,6 +9,10 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ThreadUtils;
+import com.mohe.fastdevpro.utils.ThreadSimpleTask;
+
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
@@ -41,7 +45,7 @@ public class SocketService extends Service {
     private SocketBinder socketBinder = new SocketBinder();
 
     //url地址需要修改
-    public static String address = "ws://" +"url"+":7234";
+    public static String address ="ws://" +"47.244.149.48:84/ws.ashx";
 
     private static Map<String, String> map = new HashMap<>();
     private static WebSocketClient mSocketClient;
@@ -65,6 +69,7 @@ public class SocketService extends Service {
         super.onCreate();
         try {
             initSocketClient();
+            connect();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -73,8 +78,7 @@ public class SocketService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        XposedBridge.log("执行了onStartCommand()");
-        connect();
+        LogUtils.i("执行了onStartCommand()");
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -82,7 +86,7 @@ public class SocketService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        XposedBridge.log("执行了onDestory()");
+        LogUtils.i("执行了onDestory()");
     }
 
 
@@ -94,13 +98,13 @@ public class SocketService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        XposedBridge.log("绑定服务");
+        LogUtils.i("绑定服务");
         return super.onUnbind(intent);
     }
 
     @Override
     public void unbindService(ServiceConnection conn) {
-        XposedBridge.log("解绑服务");
+        LogUtils.i("解绑服务");
         super.unbindService(conn);
     }
 
@@ -115,7 +119,7 @@ public class SocketService extends Service {
 
         public void service_connect_Activity() {
             mHandler.post(heartBeatRunnable);
-            XposedBridge.log("Service关联了Activity,并在Activity执行了Service的方法");
+            LogUtils.i("Service关联了Activity,并在Activity执行了Service的方法");
 
         }
 
@@ -166,7 +170,7 @@ public class SocketService extends Service {
      */
     public static void sendMsg(String msg) {
 
-        XposedBridge.log(msg);
+        LogUtils.i(msg);
         if (mSocketClient == null)
             return;
         try {
@@ -186,11 +190,11 @@ public class SocketService extends Service {
 
     public static void initSocketClient() throws URISyntaxException {
         map.put("echo-protocol", "origin");
-        List<IProtocol> list = new ArrayList<>();
-        list.add(new Protocol("echo-protocol"));
-        Draft_6455 draft = new Draft_6455(Collections.<IExtension>emptyList(), list);
+//        List<IProtocol> list = new ArrayList<>();
+//        list.add(new Protocol("echo-protocol"));
+//        Draft_6455 draft = new Draft_6455(Collections.<IExtension>emptyList(), list);
         if (mSocketClient == null) {
-            mSocketClient = new WebSocketClient(new URI(address), draft, map) {
+            mSocketClient = new WebSocketClient(new URI(address)) {
 
                 @Override
                 public void onOpen(ServerHandshake serverHandshake) {
@@ -223,19 +227,20 @@ public class SocketService extends Service {
 
     //连接
     public static void connect() {
-
-        new Thread() {
+        ThreadUtils.executeByIo(new ThreadSimpleTask() {
+            @Nullable
             @Override
-            public void run() {
+            public Object doInBackground() throws Throwable {
                 if (mSocketClient != null) {
                     try {
                         mSocketClient.connect();
                     } catch (IllegalStateException e) {
-                        XposedBridge.log(e.toString());
+                        LogUtils.i(e.toString());
                     }
                 }
-                XposedBridge.log("socket连接");
+                LogUtils.i("socket连接");
+                return null;
             }
-        }.start();
+        });
     }
 }
