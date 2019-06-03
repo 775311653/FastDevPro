@@ -93,7 +93,8 @@ public class UnionPayXpHelper {
                 //进入到云闪付的界面时初始化一些数据,防止重复调用增加内存
                 if (isCPOrderInited=false){
                     isCPOrderInited=true;
-                    mClassLoader= ((Context)methodHookParam.args[0]).getClassLoader();
+                    mClassLoader = ((Class) methodHookParam.getResult()).getClassLoader();
+//                    mClassLoader= ((Context)methodHookParam.args[0]).getClassLoader();
                 }
 
                 if (((String) methodHookParam.args[0]).equals("com.unionpay.push.UPPushService")) {

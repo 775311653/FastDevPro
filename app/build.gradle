@@ -81,9 +81,9 @@ static def releaseTime() {
 
 afterEvaluate {
     installDebug.doLast {
-//        updateVirtualXposedAPP.execute()
-//        rebootVirtualXposedAPP.execute()
-//        launchVirtualXposedAPP.execute()
+        updateVirtualXposedAPP.execute()
+        rebootVirtualXposedAPP.execute()
+        launchVirtualXposedAPP.execute()
     }
 }
 

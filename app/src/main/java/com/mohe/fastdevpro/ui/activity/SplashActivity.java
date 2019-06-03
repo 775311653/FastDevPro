@@ -65,7 +65,7 @@ public class SplashActivity extends BaseActivity implements SplashContract.View 
                 ,PermissionConstants.CONTACTS
                 ,PermissionConstants.CAMERA).request();
 //        splashPresenter.downCountTime();
-//        splashTv.performClick();
+        splashTv.performClick();
     }
 
     @Override
