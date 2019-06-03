@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.blankj.utilcode.constant.PermissionConstants;
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.PermissionUtils;
 import com.mohe.fastdevpro.R;
 import com.mohe.fastdevpro.dymicDemo.RealSubject;
 import com.mohe.fastdevpro.dymicDemo.Subject;
@@ -58,8 +60,12 @@ public class SplashActivity extends BaseActivity implements SplashContract.View 
 
     private void initData() {
         splashPresenter = new SplashPresenter((SplashActivity) mContext);
+        PermissionUtils.permission(PermissionConstants.PHONE
+                ,PermissionConstants.STORAGE
+                ,PermissionConstants.CONTACTS
+                ,PermissionConstants.CAMERA).request();
 //        splashPresenter.downCountTime();
-        splashTv.performClick();
+//        splashTv.performClick();
     }
 
     @Override

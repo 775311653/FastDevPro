@@ -1,12 +1,16 @@
 package com.mohe.fastdevpro.utils;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Build;
 
 import com.blankj.utilcode.util.LogUtils;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -61,5 +65,71 @@ public class CommonUtils {
         }
 
         return var1;
+    }
+
+    //截图的方法
+
+    public static Bitmap centerSquareScaleBitmap(Bitmap bitmap, int edgeLength){
+      if(null == bitmap || edgeLength <= 0){
+       return  null;
+      }
+      Bitmap result = bitmap;
+      int widthOrg = bitmap.getWidth();
+      int heightOrg = bitmap.getHeight();
+    /*   if(widthOrg > edgeLength && heightOrg > edgeLength)
+      {*/
+       //压缩到一个最小长度是edgeLength的bitmap
+       int longerEdge = (int)(edgeLength * Math.max(widthOrg, heightOrg) / Math.min(widthOrg, heightOrg));
+       int scaledWidth = widthOrg > heightOrg ? longerEdge : edgeLength;
+       int scaledHeight = widthOrg > heightOrg ? edgeLength : longerEdge;
+       Bitmap scaledBitmap;
+             try{
+              scaledBitmap = Bitmap.createScaledBitmap(bitmap, scaledWidth, scaledHeight, true);
+             }
+             catch(Exception e){
+              return null;
+             }
+          //从图中截取正中间的正方形部分。
+          int xTopLeft = (scaledWidth - edgeLength) / 2;
+          int yTopLeft = (scaledHeight - edgeLength-600) / 2;
+          try{
+           result = Bitmap.createBitmap(scaledBitmap, 200, 400, 600, 600);
+           scaledBitmap.recycle();
+          }
+          catch(Exception e){
+           return null;
+          }
+     /* }  */
+      return result;
+    }
+
+
+    public static void saveMyBitmap(Bitmap mBitmap,String bitName)  {
+       File f = new File( "/sdcard/ewmtp/"+bitName + ".jpg");
+       FileOutputStream fOut = null;
+       try {
+               fOut = new FileOutputStream(f);
+       } catch (FileNotFoundException e) {
+               e.printStackTrace();
+       }
+       mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+       try {
+               fOut.flush();
+       } catch (IOException e) {
+               e.printStackTrace();
+       }
+       try {
+               fOut.close();
+       } catch (IOException e) {
+               e.printStackTrace();
+       }
+    }
+
+
+    //删除截图
+
+    public static void deleteimg(String path){
+        File file=new File(path);
+        file.delete();
     }
 }
