@@ -163,6 +163,7 @@
             android:authorities="com.mohe.fastdevpro.dbContentProvider"
             android:enabled="true"
             android:exported="true" />
+
         <service
             android:name=".study.websocket.SocketService"
             android:enabled="true"
@@ -185,7 +186,9 @@
         <activity android:name=".study.leak.LeakDemoActivity" />
         <activity android:name=".study.leak.LeakDemo2Activity" />
         <activity android:name=".study.layoutOptimize.LayoutOptimizeActivity" />
-        <activity android:name=".study.xposed.XPUnionPayActivity"></activity>
+        <activity android:name=".study.xposed.XPUnionPayActivity" />
+        <activity android:name=".study.adaptscreen.AdaptScreenDemoActivity" />
+        <activity android:name=".study.adaptscreen.CloseAdaptScreenActivity"></activity>
     </application>
 
 </manifest>

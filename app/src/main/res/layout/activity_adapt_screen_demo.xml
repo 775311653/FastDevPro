@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.mohe.fastdevpro.study.adaptscreen.AdaptScreenDemoActivity">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="360dp"
+                android:layout_height="10dp"
+                android:gravity="center"
+                android:background="@color/black"
+                android:textSize="36pt"
+                android:text="width=540pt height=960pt font=36pt"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="540pt"
+                        android:layout_height="960pt"
+                        android:gravity="center"
+                        android:background="@color/light_blue"
+                        android:textSize="36pt"
+                        android:text="width=540pt height=960pt font=36pt"/>
+                    <Button
+                        android:id="@+id/btnGoClose"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="36pt"
+                        android:text="跳转到关闭适配的页面"/>
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="540pt"
+                    android:layout_height="960pt"
+                    android:gravity="center"
+                    android:background="@color/green"
+                    android:textSize="36pt"
+                    android:text="width=540pt height=960pt font=36pt"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="540pt"
+                    android:layout_height="960pt"
+                    android:gravity="center"
+                    android:background="@color/light_black"
+                    android:textSize="36pt"
+                    android:text="width=540pt height=960pt font=36pt"/>
+                <TextView
+                    android:layout_width="540pt"
+                    android:layout_height="960pt"
+                    android:gravity="center"
+                    android:background="@color/lightyellow"
+                    android:textSize="36pt"
+                    android:text="width=540pt height=960pt font=36pt"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+
+
+</LinearLayout>
