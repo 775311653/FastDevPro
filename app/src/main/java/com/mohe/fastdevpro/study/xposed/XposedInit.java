@@ -50,8 +50,8 @@ public class XposedInit implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         XposedBridge.log("loadPackage="+lpparam.packageName);
-        MyXposedHelper.initHooking(lpparam);
-        MyXposedHelper.hookViewClick();
+//        MyXposedHelper.initHooking(lpparam);
+//        MyXposedHelper.hookViewClick();
         //逻辑:在fast1里面写xposed的代码，修改fast2里面的tv的内容，并且在fast1里面获取并打印出来。
         if (lpparam.packageName.equals(MyXposedHelper.PACKAGE_NAME_FAST_DEV_PRO)){
             XposedHelpers.findAndHookMethod(MyXposedHelper.SPLASH_ACTIVITY_NAME

@@ -14,7 +14,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             // 设置支持的SO库架构
-            abiFilters 'armeabi'
+            abiFilters 'armeabi','x86'
         }
     }
 
@@ -129,9 +129,9 @@ dependencies {
     implementation 'com.lzy.net:okgo:3.0.4'
     implementation 'com.github.chrisbanes:PhotoView:2.1.4'
     implementation 'org.greenrobot:eventbus:3.1.1'
-    provided 'de.robv.android.xposed:api:82'
-    provided 'de.robv.android.xposed:api:82:sources'
-    compile "org.java-websocket:Java-WebSocket:1.4.0"
+    compileOnly 'de.robv.android.xposed:api:82'
+    compileOnly 'de.robv.android.xposed:api:82:sources'
+    implementation "org.java-websocket:Java-WebSocket:1.4.0"
     implementation 'org.greenrobot:greendao:3.2.2'
     implementation rxJavaLibs
     debugImplementation leakLibs
