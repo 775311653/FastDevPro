@@ -5,6 +5,7 @@ import android.util.Base64;
 import com.blankj.utilcode.util.EncodeUtils;
 import com.blankj.utilcode.util.EncryptUtils;
 import com.blankj.utilcode.util.LogUtils;
+import com.mohe.fastdevpro.utils.CommonUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -353,17 +354,14 @@ public class EncryptUtilsTest {
     private byte[] bytesResAES = hexString2Bytes(resAES);
 
     @Test
-    public void aesTest() {
+    public void aesTest() throws Exception {
+
         String dataAES = "s123";
         String keyAES = "5961748251461861";
         String resAES = "hi2iGl0m6LB5Qv28PtUZIA==";
-        byte[] bytesDataAES = dataAES.getBytes();
-        byte[] bytesKeyAES = keyAES.getBytes();
-        byte[] bytesResAES = EncodeUtils.base64Decode(resAES);
-
-        byte[] b = EncryptUtils.decryptAES(bytesResAES, bytesKeyAES, "AES/ECB/NoPadding", null);
-        String strDecode = new String(b);
-        String res = strDecode.replaceAll("\f|\n|\r", "");
+        String strEncrypt = CommonUtils.encryptAES(dataAES,keyAES,null);
+        String res1= CommonUtils.decryptAES(strEncrypt,keyAES,null);
+        String res= CommonUtils.decryptAES(resAES,keyAES,null);
         LogUtils.i();
     }
 
