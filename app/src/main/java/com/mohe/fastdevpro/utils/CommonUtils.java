@@ -142,7 +142,7 @@ public class CommonUtils {
      */
     public static String encryptAES(String data, String key, String iv) throws Exception {
         try {
-            Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             int blockSize = cipher.getBlockSize();
             byte[] dataBytes = data.getBytes();
             int plaintextLength = dataBytes.length;
@@ -184,7 +184,7 @@ public class CommonUtils {
         try {
             byte[] encrypted1 = EncodeUtils.base64Decode(data);
 
-            Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             SecretKeySpec keyspec = new SecretKeySpec(key.getBytes(), "AES");
             if (iv != null) {
                 IvParameterSpec ivspec = new IvParameterSpec(iv.getBytes());

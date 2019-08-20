@@ -356,9 +356,9 @@ public class EncryptUtilsTest {
     @Test
     public void aesTest() throws Exception {
 
-        String dataAES = "s123";
+        String dataAES = "[{\"paySt\":\"2\",\"amount\":\"0.01\",\"settleAmtStr\":\"未知\",\"orderTime\":\"16:04:41\",\"orderId\":\"00005215639554810829080392\",\"orderTp\":\"1\",\"payImg\":\"http://nxt.nongxinyin.com/fvp-qp/headImages/icons/icon-weixin.png\"}]";
         String keyAES = "5961748251461861";
-        String resAES = "hi2iGl0m6LB5Qv28PtUZIA==";
+        String resAES = "+/Tbqg+9qH7yjoP3EGu8BEk6HQFoT4ZHBKIfAiefKCo1dNDGeG8r+/mbD3jXWA7mfuvHZgYPaKK0PqBoMvtJjX6EV0l1FYJk0AYtmdJ4/VsMedYT3l1AUHi6bDNp0engVBPU2ywqHiWh5OR6yVO6ltLEYKDz0wD05oZEq/Gal7+ed91SBSA+b7jyb6PYxdDvcPDYlmis0P5z9vDNMqpekxTxzJbxn021mEdMh7wv8yUvdtniJfD74WFnPehY6yEZMnpiAkvLrXtLEpL8FjayrypsaGpK6pzS8dw+E92potw=";
         String strEncrypt = CommonUtils.encryptAES(dataAES,keyAES,null);
         String res1= CommonUtils.decryptAES(strEncrypt,keyAES,null);
         String res= CommonUtils.decryptAES(resAES,keyAES,null);
