@@ -120,11 +120,11 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateUnspecified">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
 
         <!-- <activity -->
@@ -177,6 +177,19 @@
             android:name=".service.XposedQueryTransService"
             android:enabled="true"
             android:exported="true" />
+        <service
+            android:name=".study.accessibility.MyAccessibilityService"
+            android:exported="true"
+            android:label="fastDev无障碍服务"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/ren_envelop_service" />
+        </service>
 
         <activity
             android:name=".study.xposed.OpenServiceActivity"
@@ -188,7 +201,14 @@
         <activity android:name=".study.layoutOptimize.LayoutOptimizeActivity" />
         <activity android:name=".study.xposed.XPUnionPayActivity" />
         <activity android:name=".study.adaptscreen.AdaptScreenDemoActivity" />
-        <activity android:name=".study.adaptscreen.CloseAdaptScreenActivity"></activity>
+        <activity android:name=".study.adaptscreen.CloseAdaptScreenActivity" />
+        <activity android:name=".study.accessibility.XianYuHelperActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

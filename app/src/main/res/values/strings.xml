@@ -48,4 +48,5 @@
         This is intended to prevent programs from waiting for the fingerprint sensor indefinitely.
         The timeout is platform and sensor-specific, but is generally about 30 seconds.</string>
     <string name="ErrorUnableToProcess_warning">Error state returned when the sensor was unable to process the current image.</string>
+    <string name="accessibility_description">fastDevPro无障碍服务</string>
 </resources>
