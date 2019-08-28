@@ -24,6 +24,12 @@ public class MyAccessibilityService extends AccessibilityService {
 
     private static final String TAG = "MyAccessibilityService";
 
+    //是否在输入搜索商品和点赞的步骤中
+    private boolean isStepSearchAndGood = false;
+
+    //是否在滚动搜索商品的步骤中
+    private boolean isStepScrollAndFind = false;
+
     @TargetApi(Build.VERSION_CODES.N)
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -31,6 +37,10 @@ public class MyAccessibilityService extends AccessibilityService {
             try {
                 String className = (String) event.getClassName();
                 LogUtils.i("无障碍服务接收的类名：" + className);
+                if (className.equals("com.taobao.idlefish.search.activity.SearchMidActivity ")) {
+                    Thread.sleep(2000);
+
+                }
                 if (className.equals("com.taobao.idlefish.search.v1.SingleRowSearchResultActivity")) {
                     Thread.sleep(2000);
                     scroll2PositionClick(this, "男朋友的二手正品耐克", "com.taobao.idlefish:id/list_recyclerview", 1);

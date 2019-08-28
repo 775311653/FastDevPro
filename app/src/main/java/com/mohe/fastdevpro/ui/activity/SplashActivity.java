@@ -12,6 +12,7 @@ import com.mohe.fastdevpro.dymicDemo.RealSubject;
 import com.mohe.fastdevpro.dymicDemo.Subject;
 import com.mohe.fastdevpro.dymicDemo.SubjectUtils;
 import com.mohe.fastdevpro.service.StudentUtilsService;
+import com.mohe.fastdevpro.study.accessibility.XianYuHelperActivity;
 import com.mohe.fastdevpro.study.adaptscreen.AdaptScreenDemoActivity;
 import com.mohe.fastdevpro.study.layoutOptimize.LayoutOptimizeActivity;
 import com.mohe.fastdevpro.study.leak.LeakDemoActivity;
@@ -76,6 +77,6 @@ public class SplashActivity extends BaseActivity implements SplashContract.View 
 
     @OnClick(R.id.splash_tv)
     public void onViewClicked() {
-        ActivityUtils.startActivity(AdaptScreenDemoActivity.class);
+        ActivityUtils.startActivity(XianYuHelperActivity.class);
     }
 }
