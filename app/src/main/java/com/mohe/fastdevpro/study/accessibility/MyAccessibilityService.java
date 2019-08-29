@@ -6,15 +6,25 @@ import android.annotation.TargetApi;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.blankj.utilcode.util.ConvertUtils;
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.SPUtils;
+import com.mohe.fastdevpro.bean.ShopSearchBean;
+import com.mohe.fastdevpro.utils.GsonUtils;
+import com.mohe.fastdevpro.utils.JSONUtil;
+
+import org.json.JSONArray;
 
 import java.util.List;
+
+import static com.mohe.fastdevpro.study.accessibility.XianYuHelperActivity.JS_SHOP_DATA_KEY;
+import static com.mohe.fastdevpro.study.accessibility.XianYuHelperActivity.SHOP_SEARCH_TABLE;
 
 /**
  * 无障碍服务
@@ -33,17 +43,71 @@ public class MyAccessibilityService extends AccessibilityService {
     @TargetApi(Build.VERSION_CODES.N)
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+
         if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             try {
                 String className = (String) event.getClassName();
                 LogUtils.i("无障碍服务接收的类名：" + className);
-                if (className.equals("com.taobao.idlefish.search.activity.SearchMidActivity ")) {
-                    Thread.sleep(2000);
+                if (className.equals("com.taobao.fleamarket.home.activity.MainActivity")) {
+                    //没开始搜索商品点赞，就初始化获取要搜索的数据
+                    if (!isStepSearchAndGood) {
+                        String jsShopData = SPUtils.getInstance(SHOP_SEARCH_TABLE).getString(JS_SHOP_DATA_KEY);
+                        JSONArray ja = JSONUtil.getJSONArray(jsShopData);
+                        isStepSearchAndGood = true;
+                        for (int i = 0; i < ja.length(); i++) {
+                            ShopSearchBean shopSearchBean = GsonUtils.fromJson(JSONUtil.getJSONObject(ja, i).toString(), ShopSearchBean.class);
+                            Thread.sleep(i == 0 ? 10000 : 3000);
+                            //开始搜索点赞逻辑
+                            dispatchGestureView(ConvertUtils.dp2px(180), ConvertUtils.dp2px(50));
+                            Thread.sleep(1000);
+                            AccessibilityNodeInfo niSearchTerm = getNodeInfoByViewId("com.taobao.idlefish:id/search_term");
+                            if (niSearchTerm != null) {
+                                editEdtContent(niSearchTerm, shopSearchBean.getSearchKeyWord());
+                            }
+                            Thread.sleep(1000);
+                            AccessibilityNodeInfo niBtnSearch = getNodeInfoByViewId("com.taobao.idlefish:id/search_button");
+                            if (niBtnSearch != null) {
+                                niBtnSearch.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                            }
+                            Thread.sleep(2000);
+                            //点击第一家商品
+                            dispatchGestureView(ConvertUtils.dp2px(93), ConvertUtils.dp2px(270));
+                            Thread.sleep(5000);
+                            clickBack();
+                            Thread.sleep(1000);
+                            //点击第二家商品
+                            dispatchGestureView(ConvertUtils.dp2px(270), ConvertUtils.dp2px(270));
+                            Thread.sleep(5000);
+                            clickBack();
+                            Thread.sleep(1000);
 
+                            //滚动搜索我们自己的商品
+                            scroll2PositionClick(this, shopSearchBean.getMySpecialWord(), "com.taobao.idlefish:id/list_recyclerview", 1);
+                            Thread.sleep(2000);
+                            //点赞
+                            dispatchGestureView(ConvertUtils.dp2px(23), ConvertUtils.dp2px(613));
+                            Thread.sleep(800);
+                            //点击我想要
+                            dispatchGestureView(ConvertUtils.dp2px(307), ConvertUtils.dp2px(613));
+                            Thread.sleep(2000);
+                            //在我想要的聊天界面点3次返回回到首页，然后开始重复
+                            clickBack();
+                            Thread.sleep(400);
+                            clickBack();
+                            Thread.sleep(400);
+                            clickBack();
+                            Thread.sleep(400);
+                        }
+                        //循环点赞结束后关闭操作
+//                        isStepSearchAndGood=false;
+                    }
+                }
+                if (className.equals("com.taobao.idlefish.search.activity.SearchMidActivity ")) {
+//                    Thread.sleep(2000);
                 }
                 if (className.equals("com.taobao.idlefish.search.v1.SingleRowSearchResultActivity")) {
-                    Thread.sleep(2000);
-                    scroll2PositionClick(this, "男朋友的二手正品耐克", "com.taobao.idlefish:id/list_recyclerview", 1);
+//                    Thread.sleep(2000);
+//                    scroll2PositionClick(this, "男朋友的二手正品耐克", "com.taobao.idlefish:id/list_recyclerview", 1);
                 }
             } catch (Exception e) {
                 LogUtils.i(e.getMessage());
@@ -58,7 +122,7 @@ public class MyAccessibilityService extends AccessibilityService {
         GestureDescription.Builder builder = new GestureDescription.Builder();
         Path p = new Path();
         p.moveTo(position.x, position.y);
-        builder.addStroke(new GestureDescription.StrokeDescription(p, 0L, 1000L));
+        builder.addStroke(new GestureDescription.StrokeDescription(p, 0L, 100L));
         GestureDescription gesture = builder.build();
         dispatchGesture(gesture, new GestureResultCallback() {
             @Override
@@ -154,6 +218,54 @@ public class MyAccessibilityService extends AccessibilityService {
             }
 
         }
+    }
+
+    private AccessibilityNodeInfo getNodeInfoByText(String text) {
+        AccessibilityNodeInfo rootInActiveWindow = this.getRootInActiveWindow(); //获取当前展示的窗口
+
+        if (rootInActiveWindow != null) {
+            List<AccessibilityNodeInfo> item = rootInActiveWindow.findAccessibilityNodeInfosByText(text); //根据关键字查找某控件元素
+
+            if (item == null || item.size() == 0) { // 关键字元素不存在，则滚动容器元素
+                LogUtils.d(TAG, "不存在 " + text);
+            } else {
+                LogUtils.d(TAG, "有存在 " + text);
+                return item.get(0);
+            }
+
+        }
+        return null;
+    }
+
+    private AccessibilityNodeInfo getNodeInfoByViewId(String viewId) {
+        AccessibilityNodeInfo rootInActiveWindow = this.getRootInActiveWindow(); //获取当前展示的窗口
+
+        if (rootInActiveWindow != null) {
+            List<AccessibilityNodeInfo> item = rootInActiveWindow.findAccessibilityNodeInfosByViewId(viewId); //根据关键字查找某控件元素
+
+            if (item == null || item.size() == 0) { // 关键字元素不存在，则滚动容器元素
+                LogUtils.d(TAG, "不存在 ");
+            } else {
+                LogUtils.d(TAG, "有存在 ");
+                return item.get(0);
+            }
+
+        }
+        return null;
+    }
+
+    //点击返回
+    public boolean clickBack() {
+        return performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+    }
+
+    //编辑输入框的内容
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void editEdtContent(AccessibilityNodeInfo nodeInfo, String text) {
+        Bundle arguments = new Bundle();
+        arguments.putCharSequence(
+                AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text);
+        nodeInfo.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
     }
 
     /**
