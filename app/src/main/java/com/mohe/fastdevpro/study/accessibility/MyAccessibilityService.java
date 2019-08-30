@@ -7,8 +7,8 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -40,6 +40,8 @@ public class MyAccessibilityService extends AccessibilityService {
     //是否在滚动搜索商品的步骤中
     private boolean isStepScrollAndFind = false;
 
+    private boolean isJumpToTaobao = false;
+
     @TargetApi(Build.VERSION_CODES.N)
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -70,33 +72,119 @@ public class MyAccessibilityService extends AccessibilityService {
                                 niBtnSearch.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                             }
                             Thread.sleep(2000);
-                            //点击第一家商品
-                            dispatchGestureView(ConvertUtils.dp2px(93), ConvertUtils.dp2px(270));
-                            Thread.sleep(5000);
-                            clickBack();
-                            Thread.sleep(1000);
+
+                            for (int k = 0; k < shopSearchBean.getCompareGoodsCnt(); k++) {
+                                //滑动次数
+                                int slideTimes = (int) (1 + Math.random() * (3 - 1 + 1));
+                                for (int j = 0; j < slideTimes; j++) {
+                                    scrollMyView("com.taobao.idlefish:id/list_recyclerview", AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+                                }
+                                //点击第一家商品
+                                dispatchGestureView(ConvertUtils.dp2px(93), ConvertUtils.dp2px(270));
+                                Thread.sleep(5000);
+                                //跳到淘宝就点击返回到
+                                if (isJumpToTaobao) {
+                                    clickBack();
+                                    Thread.sleep(1000);
+                                    clickBack();
+                                    Thread.sleep(400);
+                                    clickBack();
+                                    Thread.sleep(400);
+                                    isJumpToTaobao = false;
+                                }else {
+                                    clickBack();
+                                    Thread.sleep(1000);
+                                }
+                            }
+
+                            //滚动3*货比的商家数，回到顶部
+                            for (int l = 0; l < 3 * shopSearchBean.getCompareGoodsCnt(); l++) {
+                                scrollMyView("com.taobao.idlefish:id/list_recyclerview", AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                            }
+
+
                             //点击第二家商品
-                            dispatchGestureView(ConvertUtils.dp2px(270), ConvertUtils.dp2px(270));
-                            Thread.sleep(5000);
-                            clickBack();
-                            Thread.sleep(1000);
+//                            dispatchGestureView(ConvertUtils.dp2px(270), ConvertUtils.dp2px(270));
+//                            Thread.sleep(5000);
+//                            clickBack();
+//                            Thread.sleep(1000);
 
                             //滚动搜索我们自己的商品
                             scroll2PositionClick(this, shopSearchBean.getMySpecialWord(), "com.taobao.idlefish:id/list_recyclerview", 1);
                             Thread.sleep(2000);
-                            //点赞
-                            dispatchGestureView(ConvertUtils.dp2px(23), ConvertUtils.dp2px(613));
-                            Thread.sleep(800);
-                            //点击我想要
-                            dispatchGestureView(ConvertUtils.dp2px(307), ConvertUtils.dp2px(613));
-                            Thread.sleep(2000);
-                            //在我想要的聊天界面点3次返回回到首页，然后开始重复
-                            clickBack();
-                            Thread.sleep(400);
-                            clickBack();
-                            Thread.sleep(400);
-                            clickBack();
-                            Thread.sleep(400);
+
+                            //先得到图片数量再点击详情图片
+                            AccessibilityNodeInfo niScollView = getNodeInfoByViewId("android:id/content")
+                                    .getChild(0)
+                                    .getChild(0)
+                                    .getChild(0)
+                                    .getChild(0)
+                                    .getChild(0)
+                                    .getChild(0)
+                                    .getChild(2)
+                                    .getChild(0);
+                            AccessibilityNodeInfo niPictureParent = niScollView.getChild(3);
+                            int picCnt = niPictureParent.getChildCount();
+                            for (int m = 0; m < picCnt; m++) {
+                                AccessibilityNodeInfo niPicture = niPictureParent.getChild(m);
+                                niPicture.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                Thread.sleep(2000);
+                                clickBack();
+                                Thread.sleep(400);
+                                //看了三张图就不看了
+                                if (m >= 3) {
+                                    break;
+                                }
+                            }
+
+                            //拉取到评论位置，停留2s
+                            scrollFindViewByText(niScollView, "全部留言");
+                            Thread.sleep(3000);
+                            //是否有要看动态和
+                            if (shopSearchBean.isLookDynamic() || shopSearchBean.isLookSellerEvaluate()) {
+                                for (int n = 0; n < 10; n++) {
+                                    niScollView.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                                }
+                                Thread.sleep(800);
+                                //点击头像进入商铺
+                                dispatchGestureView(ConvertUtils.dp2px(37), ConvertUtils.dp2px(107));
+                                Thread.sleep(3000);
+                                //点击动态
+                                dispatchGestureView(ConvertUtils.dp2px(310), ConvertUtils.dp2px(303));
+                                Thread.sleep(5000);
+                                //点击评价
+                                dispatchGestureView(ConvertUtils.dp2px(320), ConvertUtils.dp2px(303));
+                                Thread.sleep(5000);
+
+                                clickBack();
+                                Thread.sleep(400);
+                            }
+
+                            if (shopSearchBean.isClickGood()) {
+                                //点赞
+                                dispatchGestureView(ConvertUtils.dp2px(23), ConvertUtils.dp2px(613));
+                                Thread.sleep(800);
+                            }
+
+                            if (shopSearchBean.isClickWant()) {
+                                //点击我想要
+                                dispatchGestureView(ConvertUtils.dp2px(307), ConvertUtils.dp2px(613));
+                                Thread.sleep(2000);
+
+                                //在我想要的聊天界面点3次返回回到首页，然后开始重复
+                                clickBack();
+                                Thread.sleep(400);
+                                clickBack();
+                                Thread.sleep(400);
+                                clickBack();
+                                Thread.sleep(400);
+                            } else {
+                                clickBack();
+                                Thread.sleep(400);
+                                clickBack();
+                                Thread.sleep(400);
+                            }
+
                         }
                         //循环点赞结束后关闭操作
 //                        isStepSearchAndGood=false;
@@ -108,6 +196,10 @@ public class MyAccessibilityService extends AccessibilityService {
                 if (className.equals("com.taobao.idlefish.search.v1.SingleRowSearchResultActivity")) {
 //                    Thread.sleep(2000);
 //                    scroll2PositionClick(this, "男朋友的二手正品耐克", "com.taobao.idlefish:id/list_recyclerview", 1);
+                }
+                //闲鱼里面点到了淘宝去了，就停止刷单
+                if (className.equals("com.taobao.android.detail.wrapper.activity.DetailActivity")) {
+                    isJumpToTaobao = true;
                 }
             } catch (Exception e) {
                 LogUtils.i(e.getMessage());
@@ -220,6 +312,64 @@ public class MyAccessibilityService extends AccessibilityService {
         }
     }
 
+    //滚动查找viewId,需要可以滚动的对象
+    private AccessibilityNodeInfo scrollFindViewByViewId(AccessibilityNodeInfo niScrollViewOrList, String viewId) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) { //必须android4.3以上的版本
+            while (true) {
+                AccessibilityNodeInfo rootInActiveWindow = this.getRootInActiveWindow(); //获取当前展示的窗口
+
+                if (rootInActiveWindow != null) {
+                    List<AccessibilityNodeInfo> item = rootInActiveWindow.findAccessibilityNodeInfosByViewId(viewId); //根据resource id 查找容器元素；判断关键字查找出的元素是否在该容器元素中；
+
+                    if (item == null || item.size() == 0) { // 关键字元素不存在，则滚动容器元素
+                        LogUtils.d(TAG, "不存在 ");
+                        try {
+                            Thread.sleep(2000); //隔200 ms 滚动一次
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        niScrollViewOrList.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD); //触发容器元素的滚动事件
+                        LogUtils.d(TAG, "---- [ " + " ] 滚动查找中 ----");
+                    } else {
+                        LogUtils.d(TAG, "有存在 ");
+                        return item.get(0);
+                    }
+                }
+            }
+
+        }
+        return null;
+    }
+
+    //滚动查找viewId,需要可以滚动的对象
+    private AccessibilityNodeInfo scrollFindViewByText(AccessibilityNodeInfo niScrollViewOrList, String text) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) { //必须android4.3以上的版本
+            while (true) {
+                AccessibilityNodeInfo rootInActiveWindow = this.getRootInActiveWindow(); //获取当前展示的窗口
+
+                if (rootInActiveWindow != null) {
+                    List<AccessibilityNodeInfo> item = rootInActiveWindow.findAccessibilityNodeInfosByText(text); //根据关键字查找某控件元素
+
+                    if (item == null || item.size() == 0) { // 关键字元素不存在，则滚动容器元素
+                        LogUtils.d(TAG, "不存在 ");
+                        try {
+                            Thread.sleep(2000); //隔200 ms 滚动一次
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        niScrollViewOrList.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD); //触发容器元素的滚动事件
+                        LogUtils.d(TAG, "---- [ " + " ] 滚动查找中 ----");
+                    } else {
+                        LogUtils.d(TAG, "有存在 ");
+                        return item.get(0);
+                    }
+                }
+            }
+
+        }
+        return null;
+    }
+
     private AccessibilityNodeInfo getNodeInfoByText(String text) {
         AccessibilityNodeInfo rootInActiveWindow = this.getRootInActiveWindow(); //获取当前展示的窗口
 
@@ -252,6 +402,16 @@ public class MyAccessibilityService extends AccessibilityService {
 
         }
         return null;
+    }
+
+    //让viewId的view进行滚动，选择前进或后退
+    private void scrollMyView(String viewId, int nodeInfoActionForwardOrBack) {
+        AccessibilityNodeInfo nodeInfo = getNodeInfoByViewId(viewId);
+        if (nodeInfo != null && nodeInfoActionForwardOrBack == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD) {
+            nodeInfo.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD); //触发容器元素的滚动事件向下
+        } else if (nodeInfo != null && nodeInfoActionForwardOrBack == AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD) {
+            nodeInfo.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD); //触发容器元素的滚动事件向上
+        }
     }
 
     //点击返回
