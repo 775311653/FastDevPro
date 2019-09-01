@@ -72,7 +72,7 @@ public class MyAccessibilityService extends AccessibilityService {
                             if (niBtnSearch != null) {
                                 niBtnSearch.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                             }
-                            Thread.sleep(2000);
+                            Thread.sleep(5000);
 
                             for (int k = 0; k < shopSearchBean.getCompareGoodsCnt(); k++) {
                                 //滑动次数
@@ -81,22 +81,27 @@ public class MyAccessibilityService extends AccessibilityService {
                                     scrollMyView("com.taobao.idlefish:id/list_recyclerview", AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
                                 }
                                 //点击第一家商品
-                                dispatchGestureView(ConvertUtils.dp2px(93), ConvertUtils.dp2px(270));
-                                Thread.sleep(2000);
-                                //跳到淘宝就点击返回到
-                                if (isJumpToTaobao) {
-                                    clickBack();
-                                    Thread.sleep(1000);
-                                    clickBack();
-                                    Thread.sleep(400);
-                                    clickBack();
-                                    Thread.sleep(400);
-                                    isJumpToTaobao = false;
-                                }else {
-                                    pageMoveDownThenUp();
-                                    clickBack();
-                                    Thread.sleep(1000);
+                                AccessibilityNodeInfo niPicture= getNodeInfoByViewId("com.taobao.idlefish:id/h_search_view");
+                                if (niPicture != null) {
+                                    niPicture.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                    Thread.sleep(2000);
+                                    //跳到淘宝就点击返回到
+                                    if (isJumpToTaobao) {
+                                        clickBack();
+                                        Thread.sleep(1000);
+                                        clickBack();
+                                        Thread.sleep(400);
+                                        clickBack();
+                                        Thread.sleep(400);
+                                        isJumpToTaobao = false;
+                                    }else {
+                                        pageMoveDownThenUp();
+                                        clickBack();
+                                        Thread.sleep(1000);
+                                    }
                                 }
+
+
                             }
 
                             //滚动3*货比的商家数，回到顶部
