@@ -8,7 +8,6 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -50,6 +49,8 @@ public class MyAccessibilityService extends AccessibilityService {
             try {
                 String className = (String) event.getClassName();
                 LogUtils.i("无障碍服务接收的类名：" + className);
+                if (className.equals("com.idlefish.flutterbridge.flutterboost.FishFlutterActivity")) {
+                }
                 if (className.equals("com.taobao.fleamarket.home.activity.MainActivity")) {
                     //没开始搜索商品点赞，就初始化获取要搜索的数据
                     if (!isStepSearchAndGood) {
@@ -81,7 +82,7 @@ public class MyAccessibilityService extends AccessibilityService {
                                 }
                                 //点击第一家商品
                                 dispatchGestureView(ConvertUtils.dp2px(93), ConvertUtils.dp2px(270));
-                                Thread.sleep(5000);
+                                Thread.sleep(2000);
                                 //跳到淘宝就点击返回到
                                 if (isJumpToTaobao) {
                                     clickBack();
@@ -92,6 +93,7 @@ public class MyAccessibilityService extends AccessibilityService {
                                     Thread.sleep(400);
                                     isJumpToTaobao = false;
                                 }else {
+                                    pageMoveDownThenUp();
                                     clickBack();
                                     Thread.sleep(1000);
                                 }
@@ -102,55 +104,20 @@ public class MyAccessibilityService extends AccessibilityService {
                                 scrollMyView("com.taobao.idlefish:id/list_recyclerview", AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
                             }
 
-
-                            //点击第二家商品
-//                            dispatchGestureView(ConvertUtils.dp2px(270), ConvertUtils.dp2px(270));
-//                            Thread.sleep(5000);
-//                            clickBack();
-//                            Thread.sleep(1000);
-
                             //滚动搜索我们自己的商品
                             scroll2PositionClick(this, shopSearchBean.getMySpecialWord(), "com.taobao.idlefish:id/list_recyclerview", 1);
                             Thread.sleep(2000);
 
-                            //先得到图片数量再点击详情图片
-                            AccessibilityNodeInfo niScollView = getNodeInfoByViewId("android:id/content")
-                                    .getChild(0)
-                                    .getChild(0)
-                                    .getChild(0)
-                                    .getChild(0)
-                                    .getChild(0)
-                                    .getChild(0)
-                                    .getChild(2)
-                                    .getChild(0);
-                            AccessibilityNodeInfo niPictureParent = niScollView.getChild(3);
-                            int picCnt = niPictureParent.getChildCount();
-                            for (int m = 0; m < picCnt; m++) {
-                                AccessibilityNodeInfo niPicture = niPictureParent.getChild(m);
-                                niPicture.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                Thread.sleep(2000);
-                                clickBack();
-                                Thread.sleep(400);
-                                //看了三张图就不看了
-                                if (m >= 3) {
-                                    break;
-                                }
-                            }
-
-                            //拉取到评论位置，停留2s
-                            scrollFindViewByText(niScollView, "全部留言");
-                            Thread.sleep(3000);
+                            //页面拉到下方10次，再拉回顶部
+                            pageMoveDownThenUp();
                             //是否有要看动态和
                             if (shopSearchBean.isLookDynamic() || shopSearchBean.isLookSellerEvaluate()) {
-                                for (int n = 0; n < 10; n++) {
-                                    niScollView.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
-                                }
                                 Thread.sleep(800);
                                 //点击头像进入商铺
                                 dispatchGestureView(ConvertUtils.dp2px(37), ConvertUtils.dp2px(107));
                                 Thread.sleep(3000);
                                 //点击动态
-                                dispatchGestureView(ConvertUtils.dp2px(310), ConvertUtils.dp2px(303));
+                                dispatchGestureView(ConvertUtils.dp2px(220), ConvertUtils.dp2px(303));
                                 Thread.sleep(5000);
                                 //点击评价
                                 dispatchGestureView(ConvertUtils.dp2px(320), ConvertUtils.dp2px(303));
@@ -197,6 +164,7 @@ public class MyAccessibilityService extends AccessibilityService {
 //                    Thread.sleep(2000);
 //                    scroll2PositionClick(this, "男朋友的二手正品耐克", "com.taobao.idlefish:id/list_recyclerview", 1);
                 }
+
                 //闲鱼里面点到了淘宝去了，就停止刷单
                 if (className.equals("com.taobao.android.detail.wrapper.activity.DetailActivity")) {
                     isJumpToTaobao = true;
@@ -228,6 +196,66 @@ public class MyAccessibilityService extends AccessibilityService {
             }
         }, null);
     }
+
+    //手指向上滑
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void dispatchSlideUp() {
+        Point position = new Point(ConvertUtils.dp2px(180), ConvertUtils.dp2px(500));
+        GestureDescription.Builder builder = new GestureDescription.Builder();
+        Path p = new Path();
+        p.moveTo(position.x, position.y);
+        p.lineTo(ConvertUtils.dp2px(180), ConvertUtils.dp2px(100));
+        builder.addStroke(new GestureDescription.StrokeDescription(p, 0L, 300L));
+        GestureDescription gesture = builder.build();
+        dispatchGesture(gesture, new GestureResultCallback() {
+            @Override
+            public void onCompleted(GestureDescription gestureDescription) {
+                super.onCompleted(gestureDescription);
+            }
+
+            @Override
+            public void onCancelled(GestureDescription gestureDescription) {
+                super.onCancelled(gestureDescription);
+            }
+        }, null);
+    }
+
+    //手指向下滑动
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void dispatchSlideDown() {
+        Point position = new Point(ConvertUtils.dp2px(180), ConvertUtils.dp2px(100));
+        GestureDescription.Builder builder = new GestureDescription.Builder();
+        Path p = new Path();
+        p.moveTo(position.x, position.y);
+        p.lineTo(ConvertUtils.dp2px(180), ConvertUtils.dp2px(500));
+        builder.addStroke(new GestureDescription.StrokeDescription(p, 0L, 300L));
+        GestureDescription gesture = builder.build();
+        dispatchGesture(gesture, new GestureResultCallback() {
+            @Override
+            public void onCompleted(GestureDescription gestureDescription) {
+                super.onCompleted(gestureDescription);
+            }
+
+            @Override
+            public void onCancelled(GestureDescription gestureDescription) {
+                super.onCancelled(gestureDescription);
+            }
+        }, null);
+    }
+
+    //开始滑动到页面下方，然后再滑动到顶部
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void pageMoveDownThenUp() throws InterruptedException {
+        for (int i=0;i<20;i++){
+            dispatchSlideUp();
+            Thread.sleep(300);
+        }
+        for (int i=0;i<22;i++){
+            dispatchSlideDown();
+            Thread.sleep(300);
+        }
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void clickPoint(final int x, final int y) {

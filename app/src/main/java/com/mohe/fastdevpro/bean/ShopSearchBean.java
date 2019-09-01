@@ -1,6 +1,10 @@
 package com.mohe.fastdevpro.bean;
 
-public class ShopSearchBean {
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
+public class ShopSearchBean implements Serializable {
     //搜索的关键字
     private String searchKeyWord;
     //我们商品的标题名字

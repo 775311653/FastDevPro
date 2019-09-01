@@ -17,16 +17,15 @@
         android:layout_height="wrap_content"
         android:hint="我们商品包含的内容"/>
     <Button
-        android:id="@+id/btn_save_shop"
+        android:id="@+id/btnJumpSet"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:text="修改并保存"/>
+        android:text="设置"/>
     <Button
         android:id="@+id/btn_delete"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:text="删除"/>
-
 </LinearLayout>

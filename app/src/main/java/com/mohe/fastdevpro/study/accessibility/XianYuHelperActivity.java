@@ -2,6 +2,7 @@ package com.mohe.fastdevpro.study.accessibility;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
 
+import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
@@ -46,8 +48,16 @@ public class XianYuHelperActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_xian_yu_helper);
         ButterKnife.bind(this);
-        initData();
+//        initData();
         initView();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        shopSearchBeans.clear();
+        initData();
+        adapter.notifyDataSetChanged();
     }
 
     private void initData() {
@@ -85,25 +95,23 @@ public class XianYuHelperActivity extends BaseActivity {
             }
 
             @Override
-            public void onBindViewHolder(@NonNull final BaseViewHolder helper, int position) {
+            public void onBindViewHolder(@NonNull final BaseViewHolder helper, final int position) {
                 final ShopSearchBean item = shopSearchBeans.get(position);
                 helper.setText(R.id.et_search_key_word, item.getSearchKeyWord());
                 helper.setText(R.id.et_contain_content, item.getMySpecialWord());
-                helper.setOnClickListener(R.id.btn_save_shop, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        shopSearchBeans.get(helper.getLayoutPosition()).setSearchKeyWord(
-                                ((EditText) helper.getView(R.id.et_search_key_word)).getText().toString());
-                        shopSearchBeans.get(helper.getLayoutPosition()).setMySpecialWord(
-                                ((EditText) helper.getView(R.id.et_contain_content)).getText().toString());
-                        adapter.notifyDataSetChanged();
-                    }
-                });
                 helper.setOnClickListener(R.id.btn_delete, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         shopSearchBeans.remove(item);
                         adapter.notifyDataSetChanged();
+                    }
+                });
+                helper.setOnClickListener(R.id.btnJumpSet, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(XianYuHelperActivity.this, SearchInfoSetActivity.class);
+                        intent.putExtra("index", position);
+                        ActivityUtils.startActivity(intent);
                     }
                 });
             }
