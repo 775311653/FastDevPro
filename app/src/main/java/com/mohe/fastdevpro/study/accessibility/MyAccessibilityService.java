@@ -79,6 +79,7 @@ public class MyAccessibilityService extends AccessibilityService {
                                 int slideTimes = (int) (1 + Math.random() * (3 - 1 + 1));
                                 for (int j = 0; j < slideTimes; j++) {
                                     scrollMyView("com.taobao.idlefish:id/list_recyclerview", AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+                                    Thread.sleep(2000);
                                 }
                                 //点击第一家商品
                                 AccessibilityNodeInfo niPicture= getNodeInfoByViewId("com.taobao.idlefish:id/h_search_view");
@@ -95,7 +96,7 @@ public class MyAccessibilityService extends AccessibilityService {
                                         Thread.sleep(400);
                                         isJumpToTaobao = false;
                                     }else {
-                                        pageMoveDownThenUp();
+                                        pageMoveDownThenUp(20);
                                         clickBack();
                                         Thread.sleep(1000);
                                     }
@@ -107,6 +108,7 @@ public class MyAccessibilityService extends AccessibilityService {
                             //滚动3*货比的商家数，回到顶部
                             for (int l = 0; l < 3 * shopSearchBean.getCompareGoodsCnt(); l++) {
                                 scrollMyView("com.taobao.idlefish:id/list_recyclerview", AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+                                Thread.sleep(3000);
                             }
 
                             //滚动搜索我们自己的商品
@@ -114,7 +116,7 @@ public class MyAccessibilityService extends AccessibilityService {
                             Thread.sleep(2000);
 
                             //页面拉到下方10次，再拉回顶部
-                            pageMoveDownThenUp();
+                            pageMoveDownThenUp(20);
                             //是否有要看动态和
                             if (shopSearchBean.isLookDynamic() || shopSearchBean.isLookSellerEvaluate()) {
                                 Thread.sleep(800);
@@ -123,10 +125,12 @@ public class MyAccessibilityService extends AccessibilityService {
                                 Thread.sleep(3000);
                                 //点击动态
                                 dispatchGestureView(ConvertUtils.dp2px(220), ConvertUtils.dp2px(303));
-                                Thread.sleep(5000);
+                                Thread.sleep(400);
+                                pageMoveDownThenUp(8);
                                 //点击评价
                                 dispatchGestureView(ConvertUtils.dp2px(320), ConvertUtils.dp2px(303));
-                                Thread.sleep(5000);
+                                Thread.sleep(400);
+                                pageMoveDownThenUp(8);
 
                                 clickBack();
                                 Thread.sleep(400);
@@ -250,14 +254,14 @@ public class MyAccessibilityService extends AccessibilityService {
 
     //开始滑动到页面下方，然后再滑动到顶部
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void pageMoveDownThenUp() throws InterruptedException {
-        for (int i=0;i<20;i++){
+    private void pageMoveDownThenUp(int times) throws InterruptedException {
+        for (int i=0;i<times;i++){
             dispatchSlideUp();
-            Thread.sleep(300);
+            Thread.sleep(2000);
         }
-        for (int i=0;i<22;i++){
+        for (int i=0;i<times+2;i++){
             dispatchSlideDown();
-            Thread.sleep(300);
+            Thread.sleep(2000);
         }
     }
 
